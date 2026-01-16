@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V26 - Textos Rigorosos)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V28 - Dinâmico)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -51,60 +51,61 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (V26 - TEXTOS JURÍDICOS EXATOS) ---
+# --- 3. REGRAS DINÂMICAS ---
+
+# REGRA 0: Só é enviada para a IA se houver arquivo de Vistoria de Entrada
+REGRA_COMPARACAO = """
+--- 0. REGRA DE OURO: DANO PRÉ-EXISTENTE (MODO COMPARATIVO ATIVO) ---
+O USUÁRIO FORNECEU A VISTORIA DE ENTRADA. SUA OBRIGAÇÃO É COMPARAR.
+Antes de aprovar qualquer item (inclusive Pintura Interna), verifique a VISTORIA DE ENTRADA fornecida.
+Se o item já estava descrito como "Desgastado", "Ruim", "Manchado", "Riscado" ou "Danificado" na ENTRADA e não houve piora significativa:
+❌ STATUS: Negado
+❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+"""
+
+# BASE DE CONHECIMENTO PADRÃO (Sempre ativa)
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Analise cada item do orçamento. Se for NEGAR, use EXATAMENTE as frases abaixo, sem mudar nenhuma vírgula.
+Analise cada item do orçamento aplicando estritamente as regras abaixo.
+Se for NEGAR, use EXATAMENTE as frases abaixo.
 
 --- 1. LIMPEZA (APROVAR SUJEIRA, NEGAR MATO) ---
-A regra de "Desgaste Natural" NÃO se aplica a sujeira (pó, gordura, lixo).
-✅ APROVAR:
-- "Limpeza interna", "Faxina", "Limpeza pesada".
-- "Limpeza externa" (apenas piso/revestimento sujo ou retirada de lixo/entulho).
-- "Limpeza de caixa de gordura".
-- "Taxa de bota-fora" (Retirada de itens deixados).
+A regra de "Desgaste Natural" NÃO se aplica a sujeira.
+✅ APROVAR: "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza externa" (piso/entulho), "Caixa de gordura", "Bota-fora".
 
 --- 2. PINTURA INTERNA (APROVAR) ---
-Pintura de PAREDES, TETOS, PORTAS ou JANELAS (Lado interno) deve ser paga pelo inquilino.
+Pintura de PAREDES, TETOS, PORTAS (Lado interno).
+Regra Padrão: O inquilino deve devolver pintado/novo.
 ✅ STATUS: Aprovado
 MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 
 --- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR - AÇÃO DO TEMPO) ---
-REGRA GERAL: Itens expostos ao tempo (Sol, Chuva, Natureza) são desgastes naturais.
-❌ ITENS A NEGAR:
-- Pintura de Fachada, Muros, Portões Externos, Telhados.
-- JARDINAGEM: Corte de mato, capina, poda de árvores, limpeza de jardim.
+Itens expostos ao tempo (Sol, Chuva).
+❌ ITENS A NEGAR: Pintura de Fachada, Muros, Portões Externos, Telhados, Jardinagem, Capina.
 ❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
-🚨 EXCEÇÃO (ANIMAIS): Se a descrição citar "Animal", "Cachorro", "Gato", "Urina".
-✅ STATUS: Aprovado (Mesmo se for externo ou jardim).
-MOTIVO: "Danos causados por animais de estimação (Não é desgaste natural)."
+🚨 EXCEÇÃO (ANIMAIS): Se citar "Animal", "Cachorro", "Urina" → ✅ APROVADO (Motivo: Danos por animais).
 
 --- 4. RESTITUIÇÃO AO ESTADO ORIGINAL (APROVAR REMOÇÕES) ---
-Se o orçamento cobra para REMOVER/DEMOLIR itens instalados pelo inquilino.
-Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
+Remover benfeitorias feitas pelo inquilino (Canil, Divisória, Varal, Telas).
 ✅ STATUS: Aprovado
 MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
---- 5. DESGASTE NATURAL / MOBÍLIA (NEGAR - USO NORMAL) ---
-Itens móveis, desgaste de piso, móveis planejados (riscos leves), lâmpadas queimadas.
+--- 5. DESGASTE NATURAL / MOBÍLIA (NEGAR) ---
+Itens móveis, desgaste de piso (riscos leves), lâmpadas, móveis planejados (uso normal).
 ❌ STATUS: Negado
 ❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
 --- 6. REDES HIDRÁULICAS E ELÉTRICAS ---
-A) NEGAR (Vício Oculto/Desgaste): Fiação interna, resistência queimada, cano oculto, Alarme, Interfone.
-❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
-"Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
-
-B) APROVAR (Dano Físico): Tomadas quebradas (físico), Torneiras quebradas/soltas, Louças quebradas.
+A) NEGAR (Oculto): Fiação interna, resistência queimada, cano oculto, Alarme.
+❌ MOTIVO OBRIGATÓRIO: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+B) APROVAR (Físico): Tomadas quebradas, Torneiras quebradas, Louças quebradas.
 
 --- 7. ATO ILÍCITO / FURTO (NEGAR) ---
-Se o orçamento diz "Repor item furtado" ou "Item roubado".
-❌ STATUS: Negado
-❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
-"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
+❌ MOTIVO OBRIGATÓRIO: "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
 
 --- FORMATO DE SAÍDA (JSON) ---
 [
@@ -117,15 +118,12 @@ Se o orçamento diz "Repor item furtado" ou "Item roubado".
 ]
 """
 
-# --- 3.1. EXEMPLOS DE APRENDIZADO (COM MOTIVOS RIGOROSOS) ---
+# EXEMPLOS DE APRENDIZADO
 EXEMPLOS_TREINAMENTO = """
 USE ESTES CASOS REAIS COMO GABARITO (ATENÇÃO AOS TEXTOS EXATOS):
 
 --- CASOS DE JARDINAGEM E TEMPO (MOTIVO LONGO) ---
 Item: "Limpeza Mato / Capina química" -> NEGADO
-Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
-
-Item: "Pintura em geral de teto e parede externa" -> NEGADO
 Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
 --- CASOS DE DESGASTE SIMPLES (MOTIVO CURTO) ---
@@ -142,14 +140,14 @@ Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APR
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V26 - Rigoroso)")
-st.caption("Regras V26: Negativas usam EXATAMENTE o texto da Base de Conhecimento.")
+st.title("🏢 Analisador Loft (V28 - Dinâmico)")
+st.caption("Lógica Inteligente: Só verifica 'Dano Pré-existente' se houver Vistoria de Entrada anexada.")
 
 col1, col2 = st.columns(2)
 with col1:
-    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada", type=['pdf', 'jpg', 'png'], key="entrada")
+    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Opcional)", type=['pdf', 'jpg', 'png'], key="entrada")
 with col2:
-    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída", type=['pdf', 'jpg', 'png'], key="saida")
+    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída (Opcional)", type=['pdf', 'jpg', 'png'], key="saida")
 
 st.markdown("---")
 st.markdown("### 💰 3. Orçamento")
@@ -166,22 +164,31 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Analisando com rigor jurídico...", expanded=True) as status:
+    with st.status("⚖️ Processando regras...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
-            
-            # Se der erro 404/Not Found, altere 'gemini-2.5-flash' para 'gemini-1.5-flash'
             model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
             
-            prompt_parts = [BASE_CONHECIMENTO]
-            prompt_parts.append(EXEMPLOS_TREINAMENTO) 
+            prompt_parts = []
 
+            # --- LÓGICA DINÂMICA (AQUI ESTÁ O SEGREDO) ---
+            # Se o usuário mandou a Vistoria de Entrada, adicionamos a REGRA DE COMPARAÇÃO.
+            # Se não mandou, essa regra nem entra no prompt, evitando confusão.
             if vistoria_entrada:
-                prompt_parts.append("CONTEXTO: ENTRADA")
+                prompt_parts.append(REGRA_COMPARACAO) # <--- SÓ ENTRA SE TIVER ARQUIVO
+                st.toast("Modo Comparativo: ATIVADO ✅")
+            
+            # Adiciona as regras padrão e os exemplos
+            prompt_parts.append(BASE_CONHECIMENTO)
+            prompt_parts.append(EXEMPLOS_TREINAMENTO)
+
+            # Adiciona os arquivos
+            if vistoria_entrada:
+                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA")
                 prompt_parts.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
             
             if vistoria_saida:
-                prompt_parts.append("CONTEXTO: SAÍDA")
+                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE SAÍDA")
                 prompt_parts.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
 
             prompt_parts.append("ORÇAMENTO A ANALISAR:")
@@ -190,6 +197,7 @@ if st.button("⚡ ANALISAR AGORA"):
             else:
                 prompt_parts.append(orcamento_texto)
 
+            # Gera a resposta
             response = model.generate_content(prompt_parts)
             df = pd.read_json(io.StringIO(response.text))
             
