@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V22)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V23)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -51,8 +51,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (V22 - REGRA BLINDADA DE LIMPEZA) ---
-BASE_CONHECIMENTO = # --- 3. BASE DE CONHECIMENTO (V23 - COM EXCEÇÃO PARA ANIMAIS E RESTITUIÇÃO) ---
+# --- 3. BASE DE CONHECIMENTO (V23 - COM EXCEÇÃO PARA ANIMAIS E RESTITUIÇÃO) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
 Analise cada item do orçamento aplicando estritamente as regras abaixo.
@@ -114,8 +113,8 @@ Se o orçamento diz "Repor item furtado" ou "Item roubado".
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V22 - Limpeza Corrigida)")
-st.caption("Correção: Limpeza (Interna, Externa e Caixa de Gordura) agora é APROVADA por falta de manutenção.")
+st.title("🏢 Analisador Loft (V23 - Ajustado)")
+st.caption("Correções V23: Aprova danos de animais e remoção de benfeitorias (Canil, Varal, Telas).")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -138,7 +137,7 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Verificando regras de Limpeza e Manutenção...", expanded=True) as status:
+    with st.status("⚖️ Verificando regras (V23)...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
