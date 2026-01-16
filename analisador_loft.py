@@ -5,7 +5,7 @@ import io
 
 # --- 1. SUA CHAVE API ---
 # Correção: Use o NOME da variável, não a chave em si
-CHAVE_SECRETA = st.secrets["AIzaSyCw81FxyeCB-UJmV_k2J6VrxJWb5qrd__Y"]
+CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
 st.set_page_config(page_title="Analisador Loft (Termo Oficial)", page_icon="🏢", layout="wide")
