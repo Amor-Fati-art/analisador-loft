@@ -11,38 +11,18 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V28 - Dinâmico)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V29 - Treinamento Manual)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-        
         div.stButton > button:first-child {
-            background-color: #ff6200;
-            color: white;
-            font-weight: bold;
-            border: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            text-transform: uppercase;
-            border-radius: 8px;
+            background-color: #ff6200; color: white; font-weight: bold; border: none; width: 100%; padding: 15px; font-size: 18px; text-transform: uppercase; border-radius: 8px;
         }
-        div.stButton > button:first-child:hover {
-            background-color: #e55800;
-            color: white;
-        }
-        
-        /* CARD VISUAL */
+        div.stButton > button:first-child:hover { background-color: #e55800; color: white; }
         .card { padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 5px solid; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; font-size: 14px; background-color: #1e1e1e; }
         .card-green { border-color: #28a745; color: #e6ffe6; }
         .card-yellow { border-color: #ffc107; color: #fffbe6; }
         .card-red { border-color: #dc3545; color: #ffe6e6; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; text-transform: uppercase; color: black; }
-        .bg-green { background-color: #28a745; color: white; }
-        .bg-yellow { background-color: #ffc107; }
         .card-price { font-weight: bold; font-size: 15px; min-width: 80px; text-align: right; }
         .section-title { margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 16px; }
         .green-text { color: #28a745; }
@@ -51,52 +31,45 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. REGRAS DINÂMICAS ---
+# --- 3. REGRAS E CÉREBRO DA IA ---
 
-# REGRA 0: Só é enviada para a IA se houver arquivo de Vistoria de Entrada
+# REGRA 0: Só ativa se tiver Vistoria de Entrada
 REGRA_COMPARACAO = """
 --- 0. REGRA DE OURO: DANO PRÉ-EXISTENTE (MODO COMPARATIVO ATIVO) ---
 O USUÁRIO FORNECEU A VISTORIA DE ENTRADA. SUA OBRIGAÇÃO É COMPARAR.
-Antes de aprovar qualquer item (inclusive Pintura Interna), verifique a VISTORIA DE ENTRADA fornecida.
+Antes de aprovar qualquer item, verifique a VISTORIA DE ENTRADA fornecida.
 Se o item já estava descrito como "Desgastado", "Ruim", "Manchado", "Riscado" ou "Danificado" na ENTRADA e não houve piora significativa:
 ❌ STATUS: Negado
-❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+❌ MOTIVO OBRIGATÓRIO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 """
 
-# BASE DE CONHECIMENTO PADRÃO (Sempre ativa)
+# BASE DE CONHECIMENTO PADRÃO
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
 Analise cada item do orçamento aplicando estritamente as regras abaixo.
 Se for NEGAR, use EXATAMENTE as frases abaixo.
 
 --- 1. LIMPEZA (APROVAR SUJEIRA, NEGAR MATO) ---
-A regra de "Desgaste Natural" NÃO se aplica a sujeira.
 ✅ APROVAR: "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza externa" (piso/entulho), "Caixa de gordura", "Bota-fora".
 
 --- 2. PINTURA INTERNA (APROVAR) ---
-Pintura de PAREDES, TETOS, PORTAS (Lado interno).
-Regra Padrão: O inquilino deve devolver pintado/novo.
 ✅ STATUS: Aprovado
 MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 
 --- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR - AÇÃO DO TEMPO) ---
-Itens expostos ao tempo (Sol, Chuva).
 ❌ ITENS A NEGAR: Pintura de Fachada, Muros, Portões Externos, Telhados, Jardinagem, Capina.
-❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+❌ MOTIVO OBRIGATÓRIO:
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
 🚨 EXCEÇÃO (ANIMAIS): Se citar "Animal", "Cachorro", "Urina" → ✅ APROVADO (Motivo: Danos por animais).
 
 --- 4. RESTITUIÇÃO AO ESTADO ORIGINAL (APROVAR REMOÇÕES) ---
-Remover benfeitorias feitas pelo inquilino (Canil, Divisória, Varal, Telas).
+Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
 ✅ STATUS: Aprovado
 MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
 --- 5. DESGASTE NATURAL / MOBÍLIA (NEGAR) ---
-Itens móveis, desgaste de piso (riscos leves), lâmpadas, móveis planejados (uso normal).
-❌ STATUS: Negado
-❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+❌ MOTIVO OBRIGATÓRIO:
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
 --- 6. REDES HIDRÁULICAS E ELÉTRICAS ---
@@ -108,44 +81,60 @@ B) APROVAR (Físico): Tomadas quebradas, Torneiras quebradas, Louças quebradas.
 ❌ MOTIVO OBRIGATÓRIO: "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
 
 --- FORMATO DE SAÍDA (JSON) ---
-[
-  {
-    "Item": "Texto original",
-    "Valor": 0.00,
-    "Status": "Aprovado / Atenção / Negado",
-    "Motivo": "Cole a frase exata aqui"
-  }
-]
+[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Atenção / Negado", "Motivo": "Cole a frase exata aqui" } ]
 """
 
-# EXEMPLOS DE APRENDIZADO
+# --- AREA DE TREINAMENTO (COLE SEUS EXEMPLOS AQUI) ---
+# Você pode colar centenas de linhas aqui dentro das aspas triplas.
+# Não se preocupe com o tamanho.
 EXEMPLOS_TREINAMENTO = """
-USE ESTES CASOS REAIS COMO GABARITO (ATENÇÃO AOS TEXTOS EXATOS):
+AQUI ESTÃO EXEMPLOS DE ANÁLISES REAIS (GABARITO):
 
---- CASOS DE JARDINAGEM E TEMPO (MOTIVO LONGO) ---
+CASO 1:
 Item: "Limpeza Mato / Capina química" -> NEGADO
-Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
+Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura..."
 
---- CASOS DE DESGASTE SIMPLES (MOTIVO CURTO) ---
+CASO 2:
 Item: "Kit lâmpadas LED" -> NEGADO
-Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel..."
 
---- CASOS ELÉTRICOS OCULTOS (MOTIVO REDES) ---
+CASO 3:
 Item: "Manutenção Central de Alarme" -> NEGADO
-Motivo: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+Motivo: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes..."
 
---- CASOS DE RESTITUIÇÃO E ANIMAIS (APROVADOS) ---
-Item: "Remover 07 Canil Cimento" -> APROVADO (Motivo: Restituição ao estado original).
-Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Motivo: Danos causados por animais de estimação).
+CASO 4:
+Item: "Remover 07 Canil Cimento" -> APROVADO (Restituição ao estado original).
+
+CASO 5:
+Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Danos causados por animais de estimação).
+
+*** COLE AQUI ABAIXO OS OUTROS EXEMPLOS DO SEU COLEGA ***
+Detalhamento Geral do(s) valor(es) aprovado(s)
+Reparos:• Pintura interna: R$ 1.308,00
+• Limpeza piso do imóvel depois dos reparos: R$ 215,00
+• Pintura portas e aberturas: R$ 384,50
+• Retoque pintura portas: R$ 230,00
+• Limpeza de piso pós reparos: R$ 215,00
+
+Valor(es) negado(s)
+Reparos:• Diferença refera: R$ 689,65Motivo da negativa:Valores negados, visto que a aprovação dos reparos foi realizada de acordo com os valores praticados na região em que atua, conforme orçamento Refera.
+• Troca de luminária: R$ 40,00Motivo da negativa:Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xi) danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+• Repor cortina bege: R$ 1.750,00
+• Colocar uma cama completa: R$ 2.100,00
+• Reparar prateleira do nicho empenado: R$ 450,00
+• Repor 1 faca e 1 espeto de cabo branco parcialmente negado conforme valor da linha: R$ 130,00Motivo da negativa:Valores Contratados: Independentemente da anuência do(s) Locatário(s) e/ou Corresponsável(eis), as despesas que venham a ser indicadas pela Imobiliária para fins de composição do Valor Locatício, a Fiança Loft será prestada para fins de pagamento dos Valores Contratados, que incluem:
+(iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.Valor total negado: R$ 5.159,65
+
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V28 - Dinâmico)")
-st.caption("Lógica Inteligente: Só verifica 'Dano Pré-existente' se houver Vistoria de Entrada anexada.")
+st.title("🏢 Analisador Loft (V29 - Big Data)")
+st.caption("Sistema treinado com regras rígidas e exemplos manuais.")
 
 col1, col2 = st.columns(2)
 with col1:
-    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Opcional)", type=['pdf', 'jpg', 'png'], key="entrada")
+    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Ativa Regra 0)", type=['pdf', 'jpg', 'png'], key="entrada")
 with col2:
     vistoria_saida = st.file_uploader("📂 2. Vistoria Saída (Opcional)", type=['pdf', 'jpg', 'png'], key="saida")
 
@@ -164,25 +153,21 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Processando regras...", expanded=True) as status:
+    with st.status("⚖️ Processando...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
             
             prompt_parts = []
 
-            # --- LÓGICA DINÂMICA (AQUI ESTÁ O SEGREDO) ---
-            # Se o usuário mandou a Vistoria de Entrada, adicionamos a REGRA DE COMPARAÇÃO.
-            # Se não mandou, essa regra nem entra no prompt, evitando confusão.
+            # Lógica Dinâmica: Só ativa Comparação se tiver Vistoria de Entrada
             if vistoria_entrada:
-                prompt_parts.append(REGRA_COMPARACAO) # <--- SÓ ENTRA SE TIVER ARQUIVO
+                prompt_parts.append(REGRA_COMPARACAO)
                 st.toast("Modo Comparativo: ATIVADO ✅")
             
-            # Adiciona as regras padrão e os exemplos
             prompt_parts.append(BASE_CONHECIMENTO)
-            prompt_parts.append(EXEMPLOS_TREINAMENTO)
+            prompt_parts.append(EXEMPLOS_TREINAMENTO) # Aqui ele lê o bloco gigante de texto
 
-            # Adiciona os arquivos
             if vistoria_entrada:
                 prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA")
                 prompt_parts.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
@@ -197,7 +182,6 @@ if st.button("⚡ ANALISAR AGORA"):
             else:
                 prompt_parts.append(orcamento_texto)
 
-            # Gera a resposta
             response = model.generate_content(prompt_parts)
             df = pd.read_json(io.StringIO(response.text))
             
@@ -225,13 +209,10 @@ if st.button("⚡ ANALISAR AGORA"):
                 for i, row in negados.iterrows():
                     st.markdown(f'<div class="card card-red"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
-            # --- 7. ÁREA DE CÓPIA PARA ONENOTE ---
+            # --- 7. RELATÓRIO ---
             st.divider()
-            st.subheader("📋 Relatório Final (Para OneNote)")
-            st.info("💡 Passe o mouse no canto da caixa preta para copiar.")
-
-            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n"
-            relatorio += "========================================\n\n"
+            st.subheader("📋 Relatório Final")
+            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n========================================\n\n"
             
             if not aprovados.empty:
                 relatorio += "✅ APROVADOS:\n"
@@ -239,13 +220,6 @@ if st.button("⚡ ANALISAR AGORA"):
                     relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
                 relatorio += "\n"
             
-            if not atencao.empty:
-                relatorio += "⚠️ ATENÇÃO:\n"
-                for i, r in atencao.iterrows():
-                    relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    relatorio += f"    Motivo: {r['Motivo']}\n"
-                relatorio += "\n"
-
             if not negados.empty:
                 relatorio += "⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
@@ -255,11 +229,7 @@ if st.button("⚡ ANALISAR AGORA"):
             total_aprovado = aprovados['Valor'].sum()
             total_negado = negados['Valor'].sum()
             
-            relatorio += "\n========================================\n"
-            relatorio += f"💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n"
-            relatorio += f"📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}\n"
-            relatorio += "========================================"
-
+            relatorio += f"\n💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}"
             st.code(relatorio, language='text')
 
         except Exception as e:
