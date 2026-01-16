@@ -4,7 +4,8 @@ import pandas as pd
 import io
 
 # --- 1. SUA CHAVE API ---
-CHAVE_SECRETA = "AIzaSyAlavpN_GYrq8Xro-PRWgVmdzY0mkbvLrQ"
+# Correção: Use o NOME da variável, não a chave em si
+CHAVE_SECRETA = st.secrets["AIzaSyCw81FxyeCB-UJmV_k2J6VrxJWb5qrd__Y"]
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
 st.set_page_config(page_title="Analisador Loft (Termo Oficial)", page_icon="🏢", layout="wide")
