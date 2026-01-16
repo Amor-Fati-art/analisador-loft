@@ -46,43 +46,40 @@ Se o item já estava descrito como "Desgastado", "Ruim", "Manchado", "Riscado" o
 # BASE DE CONHECIMENTO PADRÃO
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Analise cada item do orçamento aplicando estritamente as regras abaixo.
-Se for NEGAR, use EXATAMENTE as frases abaixo.
+Sua análise deve ser cirúrgica. NÃO invente motivos. NÃO misture os textos.
 
---- 1. LIMPEZA (APROVAR SUJEIRA, NEGAR MATO) ---
+--- 1. LIMPEZA (APROVAR) ---
 ✅ APROVAR: "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza externa" (piso/entulho), "Caixa de gordura", "Bota-fora".
+MOTIVO: "Falta de manutenção adequada (limpeza)."
 
 --- 2. PINTURA INTERNA (APROVAR) ---
-✅ STATUS: Aprovado
+✅ APROVAR: Paredes, Tetos, Portas (Lado interno).
 MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 
---- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR - AÇÃO DO TEMPO) ---
-❌ ITENS A NEGAR: Pintura de Fachada, Muros, Portões Externos, Telhados, Jardinagem, Capina.
-❌ MOTIVO OBRIGATÓRIO:
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
-
-🚨 EXCEÇÃO (ANIMAIS): Se citar "Animal", "Cachorro", "Urina" → ✅ APROVADO (Motivo: Danos por animais).
-
---- 4. RESTITUIÇÃO AO ESTADO ORIGINAL (APROVAR REMOÇÕES) ---
-Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
-✅ STATUS: Aprovado
+--- 3. RESTITUIÇÃO (APROVAR) ---
+✅ APROVAR: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
 MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
---- 5. DESGASTE NATURAL / MOBÍLIA (NEGAR) ---
-❌ MOTIVO OBRIGATÓRIO:
+--- ⚠️ REGRAS DE NEGATIVA (USE O TEXTO EXATO ABAIXO) ⚠️ ---
+
+🔴 TIPO A: EXTERNO / JARDIM / TEMPO (Use para: Fachada, Muros, Telhados, Calhas, Mato, Jardim)
+❌ MOTIVO OBRIGATÓRIO (Copiar ID A):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
+
+🔴 TIPO B: ELÉTRICA / HIDRÁULICA OCULTA (Use para: Fiação interna, Alarme, Interfone, Cano dentro da parede)
+❌ MOTIVO OBRIGATÓRIO (Copiar ID B):
+"Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+
+🔴 TIPO C: ATO ILÍCITO / FURTO (Use para: Itens roubados, furtados)
+❌ MOTIVO OBRIGATÓRIO (Copiar ID C):
+"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
+
+🔴 TIPO D: DESGASTE COMUM / MOBÍLIA (Use para: Lâmpadas, Móveis, Riscos no piso, Desgaste natural interno)
+❌ MOTIVO OBRIGATÓRIO (Copiar ID D):
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
---- 6. REDES HIDRÁULICAS E ELÉTRICAS ---
-A) NEGAR (Oculto): Fiação interna, resistência queimada, cano oculto, Alarme.
-❌ MOTIVO OBRIGATÓRIO: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
-B) APROVAR (Físico): Tomadas quebradas, Torneiras quebradas, Louças quebradas.
-
---- 7. ATO ILÍCITO / FURTO (NEGAR) ---
-❌ MOTIVO OBRIGATÓRIO: "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
-
 --- FORMATO DE SAÍDA (JSON) ---
-[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Atenção / Negado", "Motivo": "Cole a frase exata aqui" } ]
-"""
+[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Negado", "Motivo": "Cole o texto do TIPO A, B, C ou D aqui" } ]"""
 
 # --- AREA DE TREINAMENTO (COLE SEUS EXEMPLOS AQUI) ---
 # Você pode colar centenas de linhas aqui dentro das aspas triplas.
@@ -125,6 +122,9 @@ Reparos:• Diferença refera: R$ 689,65Motivo da negativa:Valores negados, vist
 • Reparar prateleira do nicho empenado: R$ 450,00
 • Repor 1 faca e 1 espeto de cabo branco parcialmente negado conforme valor da linha: R$ 130,00Motivo da negativa:Valores Contratados: Independentemente da anuência do(s) Locatário(s) e/ou Corresponsável(eis), as despesas que venham a ser indicadas pela Imobiliária para fins de composição do Valor Locatício, a Fiança Loft será prestada para fins de pagamento dos Valores Contratados, que incluem:
 (iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.Valor total negado: R$ 5.159,65
+
+Pintura externa não expecificado se possui cobertura (Teto) Verificar Fotos da vistoria de entrada e saída para análise detalhada do estado
+
 
 """
 
