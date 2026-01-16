@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V29 - Treinamento Manual)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V31 - Correção Reposição)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -40,13 +40,15 @@ O USUÁRIO FORNECEU A VISTORIA DE ENTRADA. SUA OBRIGAÇÃO É COMPARAR.
 Antes de aprovar qualquer item, verifique a VISTORIA DE ENTRADA fornecida.
 Se o item já estava descrito como "Desgastado", "Ruim", "Manchado", "Riscado" ou "Danificado" na ENTRADA e não houve piora significativa:
 ❌ STATUS: Negado
-❌ MOTIVO OBRIGATÓRIO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
+❌ MOTIVO (Copiar exatamente):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 """
 
-# BASE DE CONHECIMENTO PADRÃO
+# BASE DE CONHECIMENTO V31 (COM SEPARAÇÃO DE REPOSIÇÃO/MOBÍLIA)
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Sua análise deve ser cirúrgica. NÃO invente motivos. NÃO misture os textos.
+Analise cada item do orçamento aplicando estritamente as regras abaixo.
+Se for NEGAR, use EXATAMENTE as frases (IDs) abaixo.
 
 --- 1. LIMPEZA (APROVAR) ---
 ✅ APROVAR: "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza externa" (piso/entulho), "Caixa de gordura", "Bota-fora".
@@ -60,77 +62,71 @@ MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 ✅ APROVAR: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
 MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
---- ⚠️ REGRAS DE NEGATIVA (USE O TEXTO EXATO ABAIXO) ⚠️ ---
+--- ⚠️ REGRAS DE NEGATIVA (USE O TEXTO EXATO DO TIPO CORRETO) ⚠️ ---
 
-🔴 TIPO A: EXTERNO / JARDIM / TEMPO (Use para: Fachada, Muros, Telhados, Calhas, Mato, Jardim)
+🔴 TIPO A: EXTERNO / JARDIM / TEMPO
+Use para: Fachada, Muros, Telhados, Calhas, Mato, Jardim, Ação do Sol/Chuva.
 ❌ MOTIVO OBRIGATÓRIO (Copiar ID A):
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
-🔴 TIPO B: ELÉTRICA / HIDRÁULICA OCULTA (Use para: Fiação interna, Alarme, Interfone, Cano dentro da parede)
+🔴 TIPO B: ELÉTRICA / HIDRÁULICA OCULTA
+Use para: Fiação interna, Alarme, Interfone, Cano dentro da parede.
 ❌ MOTIVO OBRIGATÓRIO (Copiar ID B):
 "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
 
-🔴 TIPO C: ATO ILÍCITO / FURTO (Use para: Itens roubados, furtados)
+🔴 TIPO C: ATO ILÍCITO / ITEM FALTANTE (REPOR)
+Use OBRIGATORIAMENTE se o item começa com "REPOR", "COLOCAR" ou "FALTANDO" (Ex: Repor cortina, Repor faca, Repor torneira roubada).
+Isso não é desgaste, é subtração de item.
 ❌ MOTIVO OBRIGATÓRIO (Copiar ID C):
 "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
 
-🔴 TIPO D: DESGASTE COMUM / MOBÍLIA (Use para: Lâmpadas, Móveis, Riscos no piso, Desgaste natural interno)
+🔴 TIPO D: DESGASTE DE ACABAMENTOS (Piso/Parede)
+Use para: Riscos leves no piso, lâmpadas queimadas, desgaste natural de uso.
 ❌ MOTIVO OBRIGATÓRIO (Copiar ID D):
 "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
---- FORMATO DE SAÍDA (JSON) ---
-[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Negado", "Motivo": "Cole o texto do TIPO A, B, C ou D aqui" } ]"""
+🔴 TIPO E: MOBÍLIA / UTENSÍLIOS (Itens Móveis)
+Use para: Cama, Sofá, Mesa, Cortina, Prateleira solta, Eletrodomésticos, Facas, Espetos.
+(Itens que não são fixos na estrutura do imóvel).
+❌ MOTIVO OBRIGATÓRIO (Copiar ID D - O termo usa o mesmo texto de desgaste, mas a lógica é de item não fixo):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
-# --- AREA DE TREINAMENTO (COLE SEUS EXEMPLOS AQUI) ---
-# Você pode colar centenas de linhas aqui dentro das aspas triplas.
-# Não se preocupe com o tamanho.
+--- FORMATO DE SAÍDA (JSON) ---
+[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Negado", "Motivo": "Cole o texto do TIPO A, B, C, D ou E aqui" } ]
+"""
+
+# --- AREA DE TREINAMENTO ---
 EXEMPLOS_TREINAMENTO = """
 AQUI ESTÃO EXEMPLOS DE ANÁLISES REAIS (GABARITO):
 
-CASO 1:
-Item: "Limpeza Mato / Capina química" -> NEGADO
+CASO 1 (JARDIM/TEMPO):
+Item: "Limpeza Mato" -> NEGADO (TIPO A - Ação do tempo)
 Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura..."
 
-CASO 2:
-Item: "Kit lâmpadas LED" -> NEGADO
+CASO 2 (REPOSIÇÃO = ATO ILÍCITO):
+Item: "Repor cortina bege" -> NEGADO (TIPO C - Ato Ilícito/Falta)
+Motivo: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
+
+Item: "Repor 1 faca e 1 espeto" -> NEGADO (TIPO C - Ato Ilícito/Falta)
+Motivo: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
+
+CASO 3 (MOBÍLIA DANIFICADA):
+Item: "Cama box Danificado" -> NEGADO (TIPO E - Mobília)
 Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel..."
 
-CASO 3:
-Item: "Manutenção Central de Alarme" -> NEGADO
-Motivo: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes..."
-
-CASO 4:
+CASO 4 (RESTITUIÇÃO):
 Item: "Remover 07 Canil Cimento" -> APROVADO (Restituição ao estado original).
 
-CASO 5:
+CASO 5 (ANIMAIS):
 Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Danos causados por animais de estimação).
 
-*** COLE AQUI ABAIXO OS OUTROS EXEMPLOS DO SEU COLEGA ***
-Detalhamento Geral do(s) valor(es) aprovado(s)
-Reparos:• Pintura interna: R$ 1.308,00
-• Limpeza piso do imóvel depois dos reparos: R$ 215,00
-• Pintura portas e aberturas: R$ 384,50
-• Retoque pintura portas: R$ 230,00
-• Limpeza de piso pós reparos: R$ 215,00
-
-Valor(es) negado(s)
-Reparos:• Diferença refera: R$ 689,65Motivo da negativa:Valores negados, visto que a aprovação dos reparos foi realizada de acordo com os valores praticados na região em que atua, conforme orçamento Refera.
-• Troca de luminária: R$ 40,00Motivo da negativa:Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
-(xi) danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
-• Repor cortina bege: R$ 1.750,00
-• Colocar uma cama completa: R$ 2.100,00
-• Reparar prateleira do nicho empenado: R$ 450,00
-• Repor 1 faca e 1 espeto de cabo branco parcialmente negado conforme valor da linha: R$ 130,00Motivo da negativa:Valores Contratados: Independentemente da anuência do(s) Locatário(s) e/ou Corresponsável(eis), as despesas que venham a ser indicadas pela Imobiliária para fins de composição do Valor Locatício, a Fiança Loft será prestada para fins de pagamento dos Valores Contratados, que incluem:
-(iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.Valor total negado: R$ 5.159,65
-
-Pintura externa não expecificado se possui cobertura (Teto) Verificar Fotos da vistoria de entrada e saída para análise detalhada do estado
-
+*** COLE SEUS EXEMPLOS DO ONENOTE AQUI ABAIXO ***
 
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V29 - Big Data)")
-st.caption("Sistema treinado com regras rígidas e exemplos manuais.")
+st.title("🏢 Analisador Loft (V31 - Reposição Corrigida)")
+st.caption("Correção: 'Repor' = Ato Ilícito | Mobília separada de Desgaste.")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -160,13 +156,12 @@ if st.button("⚡ ANALISAR AGORA"):
             
             prompt_parts = []
 
-            # Lógica Dinâmica: Só ativa Comparação se tiver Vistoria de Entrada
             if vistoria_entrada:
                 prompt_parts.append(REGRA_COMPARACAO)
                 st.toast("Modo Comparativo: ATIVADO ✅")
             
             prompt_parts.append(BASE_CONHECIMENTO)
-            prompt_parts.append(EXEMPLOS_TREINAMENTO) # Aqui ele lê o bloco gigante de texto
+            prompt_parts.append(EXEMPLOS_TREINAMENTO)
 
             if vistoria_entrada:
                 prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA")
