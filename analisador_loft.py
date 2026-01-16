@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V25 - Final)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V26 - Textos Rigorosos)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -51,10 +51,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (V25 - COM REGRA DE MATO/JARDIM) ---
+# --- 3. BASE DE CONHECIMENTO (V26 - TEXTOS JURÍDICOS EXATOS) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Analise cada item do orçamento aplicando estritamente as regras abaixo.
+Analise cada item do orçamento. Se for NEGAR, use EXATAMENTE as frases abaixo, sem mudar nenhuma vírgula.
 
 --- 1. LIMPEZA (APROVAR SUJEIRA, NEGAR MATO) ---
 A regra de "Desgaste Natural" NÃO se aplica a sujeira (pó, gordura, lixo).
@@ -69,12 +69,13 @@ Pintura de PAREDES, TETOS, PORTAS ou JANELAS (Lado interno) deve ser paga pelo i
 ✅ STATUS: Aprovado
 MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 
---- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR) ---
+--- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR - AÇÃO DO TEMPO) ---
 REGRA GERAL: Itens expostos ao tempo (Sol, Chuva, Natureza) são desgastes naturais.
-❌ NEGAR:
-- Pintura de Fachada, Muros, Portões Externos.
-- JARDINAGEM: Corte de mato, capina, poda de árvores, limpeza de jardim (Crescimento natural).
-MOTIVO: "Pagamento negado: Deterioração por ação do tempo/natureza (Item não cobrável)."
+❌ ITENS A NEGAR:
+- Pintura de Fachada, Muros, Portões Externos, Telhados.
+- JARDINAGEM: Corte de mato, capina, poda de árvores, limpeza de jardim.
+❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
 🚨 EXCEÇÃO (ANIMAIS): Se a descrição citar "Animal", "Cachorro", "Gato", "Urina".
 ✅ STATUS: Aprovado (Mesmo se for externo ou jardim).
@@ -86,19 +87,24 @@ Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas
 ✅ STATUS: Aprovado
 MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
---- 5. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
-Itens móveis: Sofás, camas, mesas, cortinas.
+--- 5. DESGASTE NATURAL / MOBÍLIA (NEGAR - USO NORMAL) ---
+Itens móveis, desgaste de piso, móveis planejados (riscos leves), lâmpadas queimadas.
 ❌ STATUS: Negado
-MOTIVO: "Pagamento negado: Deterioração de itens móveis decorrente do uso normal."
+❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
 --- 6. REDES HIDRÁULICAS E ELÉTRICAS ---
 A) NEGAR (Vício Oculto/Desgaste): Fiação interna, resistência queimada, cano oculto, Alarme, Interfone.
-B) APROVAR (Dano Físico): Tomadas quebradas (físico), Torneiras quebradas/soltas.
+❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+"Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+
+B) APROVAR (Dano Físico): Tomadas quebradas (físico), Torneiras quebradas/soltas, Louças quebradas.
 
 --- 7. ATO ILÍCITO / FURTO (NEGAR) ---
 Se o orçamento diz "Repor item furtado" ou "Item roubado".
 ❌ STATUS: Negado
-MOTIVO: "Danos causados por atos ilícitos (furto/roubo) não são cobertos."
+❌ MOTIVO OBRIGATÓRIO (Copiar exatamente):
+"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
 
 --- FORMATO DE SAÍDA (JSON) ---
 [
@@ -106,38 +112,38 @@ MOTIVO: "Danos causados por atos ilícitos (furto/roubo) não são cobertos."
     "Item": "Texto original",
     "Valor": 0.00,
     "Status": "Aprovado / Atenção / Negado",
-    "Motivo": "Justificativa curta"
+    "Motivo": "Cole a frase exata aqui"
   }
 ]
 """
 
-# --- 3.1. EXEMPLOS DE APRENDIZADO (CASOS REAIS DO USUÁRIO) ---
+# --- 3.1. EXEMPLOS DE APRENDIZADO (COM MOTIVOS RIGOROSOS) ---
 EXEMPLOS_TREINAMENTO = """
-USE ESTES CASOS REAIS COMO GABARITO (ATENÇÃO À JARDINAGEM):
+USE ESTES CASOS REAIS COMO GABARITO (ATENÇÃO AOS TEXTOS EXATOS):
 
---- CASOS DE JARDINAGEM (NEGAR) vs LIMPEZA (APROVAR) ---
-Item: "Limpeza Mato (Material e Mão de Obra)" -> NEGADO (Motivo: Crescimento natural por ação do tempo/chuva).
-Item: "Poda de árvores e limpeza de jardim" -> NEGADO (Motivo: Manutenção de paisagismo é ação do tempo).
-Item: "Remoção de entulhos e lixo no quintal" -> APROVADO (Motivo: Lixo deixado pelo inquilino não é natureza).
-Item: "Taxa de bota-fora" -> APROVADO (Motivo: Retirada de itens deixados).
+--- CASOS DE JARDINAGEM E TEMPO (MOTIVO LONGO) ---
+Item: "Limpeza Mato / Capina química" -> NEGADO
+Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
---- CASOS DE PINTURA EXTERNA ---
-Item: "Pintura em geral de teto e parede externa" -> NEGADO (Motivo: Desgaste natural por ação do tempo).
-Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Motivo: Dano causado por animal).
+Item: "Pintura em geral de teto e parede externa" -> NEGADO
+Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
---- CASOS DE REMOÇÃO / RESTITUIÇÃO (APROVAR) ---
-Item: "Remover 07 Canil Cimento e recuperar área" -> APROVADO (Motivo: Restituição ao estado original).
-Item: "Remover Telas de Proteção" -> APROVADO (Motivo: Restituição ao estado original).
-Item: "Remover Cano de PVC" -> APROVADO (Motivo: Restituição ao estado original).
+--- CASOS DE DESGASTE SIMPLES (MOTIVO CURTO) ---
+Item: "Kit lâmpadas LED" -> NEGADO
+Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
---- CASOS DE MANUTENÇÃO ---
-Item: "Manutenção Central de Alarme" -> NEGADO (Motivo: Desgaste natural de equipamento eletrônico).
-Item: "Troca de vidros trincados" -> APROVADO (Motivo: Quebra física).
+--- CASOS ELÉTRICOS OCULTOS (MOTIVO REDES) ---
+Item: "Manutenção Central de Alarme" -> NEGADO
+Motivo: "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+
+--- CASOS DE RESTITUIÇÃO E ANIMAIS (APROVADOS) ---
+Item: "Remover 07 Canil Cimento" -> APROVADO (Motivo: Restituição ao estado original).
+Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Motivo: Danos causados por animais de estimação).
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V25 - Final)")
-st.caption("Regras: Mato/Jardim (Negado) | Entulho (Aprovado) | Animais (Aprovado) | Canil/Remoções (Aprovado)")
+st.title("🏢 Analisador Loft (V26 - Rigoroso)")
+st.caption("Regras V26: Negativas usam EXATAMENTE o texto da Base de Conhecimento.")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -160,7 +166,7 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Analisando com Base de Conhecimento e Histórico...", expanded=True) as status:
+    with st.status("⚖️ Analisando com rigor jurídico...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
