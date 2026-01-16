@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V23)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V25 - Final)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -51,55 +51,54 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (V23 - COM EXCEÇÃO PARA ANIMAIS E RESTITUIÇÃO) ---
+# --- 3. BASE DE CONHECIMENTO (V25 - COM REGRA DE MATO/JARDIM) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
 Analise cada item do orçamento aplicando estritamente as regras abaixo.
 
---- 1. LIMPEZA (REGRA SUPREMA: APROVAR) ---
-A regra de "Desgaste Natural" NÃO se aplica a sujeira.
-Conforme o termo, "Falta de manutenção adequada (limpeza)" é responsabilidade do inquilino.
-✅ ITENS PARA APROVAR:
-- "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza de vidros".
-- "Limpeza externa" (frente/fundos/quintal).
-- "Limpeza de caixa de gordura" (Entupimentos ou falta de limpeza são cobráveis).
-- "Retirada de lixo/entulho" (do inquilino).
-MOTIVO A USAR: "Falta de manutenção adequada (Imóvel entregue sujo/sem conservação)."
+--- 1. LIMPEZA (APROVAR SUJEIRA, NEGAR MATO) ---
+A regra de "Desgaste Natural" NÃO se aplica a sujeira (pó, gordura, lixo).
+✅ APROVAR:
+- "Limpeza interna", "Faxina", "Limpeza pesada".
+- "Limpeza externa" (apenas piso/revestimento sujo ou retirada de lixo/entulho).
+- "Limpeza de caixa de gordura".
+- "Taxa de bota-fora" (Retirada de itens deixados).
 
 --- 2. PINTURA INTERNA (APROVAR) ---
 Pintura de PAREDES, TETOS, PORTAS ou JANELAS (Lado interno) deve ser paga pelo inquilino.
-Se o item é "Pintura Parede", "Pintura Teto" ou "Pintura Porta", o Status é APROVADO.
-MOTIVO A USAR: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
-
---- 3. PINTURA EXTERNA (ATENÇÃO: ANIMAIS APROVA) ---
-REGRA GERAL: Pinturas de itens expostos ao tempo (Fachada, Muros, Portões Externos) são NEGADAS.
-❌ STATUS: Negado
-❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Deterioração por ação do tempo/umidade."
-
-🚨 EXCEÇÃO (ANIMAIS): Se a descrição citar "Animal", "Cachorro", "Gato", "Urina", "Xixi" ou "Arranhões".
 ✅ STATUS: Aprovado
-✅ MOTIVO: "Danos causados por animais de estimação (Não é desgaste natural)."
+MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
+
+--- 3. PINTURA EXTERNA E JARDINAGEM (NEGAR) ---
+REGRA GERAL: Itens expostos ao tempo (Sol, Chuva, Natureza) são desgastes naturais.
+❌ NEGAR:
+- Pintura de Fachada, Muros, Portões Externos.
+- JARDINAGEM: Corte de mato, capina, poda de árvores, limpeza de jardim (Crescimento natural).
+MOTIVO: "Pagamento negado: Deterioração por ação do tempo/natureza (Item não cobrável)."
+
+🚨 EXCEÇÃO (ANIMAIS): Se a descrição citar "Animal", "Cachorro", "Gato", "Urina".
+✅ STATUS: Aprovado (Mesmo se for externo ou jardim).
+MOTIVO: "Danos causados por animais de estimação (Não é desgaste natural)."
 
 --- 4. RESTITUIÇÃO AO ESTADO ORIGINAL (APROVAR REMOÇÕES) ---
-Se o orçamento cobra para REMOVER/DEMOLIR itens instalados pelo inquilino (que não existiam na entrada).
-Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas", "Demolir Mureta".
+Se o orçamento cobra para REMOVER/DEMOLIR itens instalados pelo inquilino.
+Exemplos: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
 ✅ STATUS: Aprovado
-✅ MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria/alteração não autorizada)."
+MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
 
 --- 5. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
-Itens móveis deixados para uso: Sofás, camas, mesas, cadeiras, cortinas, eletrodomésticos.
+Itens móveis: Sofás, camas, mesas, cortinas.
 ❌ STATUS: Negado
-❌ MOTIVO: "Pagamento negado: Deterioração de itens móveis decorrente do uso normal."
+MOTIVO: "Pagamento negado: Deterioração de itens móveis decorrente do uso normal."
 
 --- 6. REDES HIDRÁULICAS E ELÉTRICAS ---
-A) NEGAR (Vício Oculto): Fiação interna, resistência queimada, vazamento dentro da parede, cano PVC oculto.
-   MOTIVO: "Pagamento negado... danos nas redes hidráulicas/elétricas ocultas..."
-B) APROVAR (Dano Físico): Tomadas quebradas, Torneiras quebradas/soltas, Louças quebradas.
+A) NEGAR (Vício Oculto/Desgaste): Fiação interna, resistência queimada, cano oculto, Alarme, Interfone.
+B) APROVAR (Dano Físico): Tomadas quebradas (físico), Torneiras quebradas/soltas.
 
 --- 7. ATO ILÍCITO / FURTO (NEGAR) ---
 Se o orçamento diz "Repor item furtado" ou "Item roubado".
 ❌ STATUS: Negado
-❌ MOTIVO: "Danos causados por atos ilícitos (furto/roubo) não são cobertos."
+MOTIVO: "Danos causados por atos ilícitos (furto/roubo) não são cobertos."
 
 --- FORMATO DE SAÍDA (JSON) ---
 [
@@ -112,9 +111,33 @@ Se o orçamento diz "Repor item furtado" ou "Item roubado".
 ]
 """
 
+# --- 3.1. EXEMPLOS DE APRENDIZADO (CASOS REAIS DO USUÁRIO) ---
+EXEMPLOS_TREINAMENTO = """
+USE ESTES CASOS REAIS COMO GABARITO (ATENÇÃO À JARDINAGEM):
+
+--- CASOS DE JARDINAGEM (NEGAR) vs LIMPEZA (APROVAR) ---
+Item: "Limpeza Mato (Material e Mão de Obra)" -> NEGADO (Motivo: Crescimento natural por ação do tempo/chuva).
+Item: "Poda de árvores e limpeza de jardim" -> NEGADO (Motivo: Manutenção de paisagismo é ação do tempo).
+Item: "Remoção de entulhos e lixo no quintal" -> APROVADO (Motivo: Lixo deixado pelo inquilino não é natureza).
+Item: "Taxa de bota-fora" -> APROVADO (Motivo: Retirada de itens deixados).
+
+--- CASOS DE PINTURA EXTERNA ---
+Item: "Pintura em geral de teto e parede externa" -> NEGADO (Motivo: Desgaste natural por ação do tempo).
+Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Motivo: Dano causado por animal).
+
+--- CASOS DE REMOÇÃO / RESTITUIÇÃO (APROVAR) ---
+Item: "Remover 07 Canil Cimento e recuperar área" -> APROVADO (Motivo: Restituição ao estado original).
+Item: "Remover Telas de Proteção" -> APROVADO (Motivo: Restituição ao estado original).
+Item: "Remover Cano de PVC" -> APROVADO (Motivo: Restituição ao estado original).
+
+--- CASOS DE MANUTENÇÃO ---
+Item: "Manutenção Central de Alarme" -> NEGADO (Motivo: Desgaste natural de equipamento eletrônico).
+Item: "Troca de vidros trincados" -> APROVADO (Motivo: Quebra física).
+"""
+
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V23 - Ajustado)")
-st.caption("Correções V23: Aprova danos de animais e remoção de benfeitorias (Canil, Varal, Telas).")
+st.title("🏢 Analisador Loft (V25 - Final)")
+st.caption("Regras: Mato/Jardim (Negado) | Entulho (Aprovado) | Animais (Aprovado) | Canil/Remoções (Aprovado)")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -137,13 +160,15 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Verificando regras (V23)...", expanded=True) as status:
+    with st.status("⚖️ Analisando com Base de Conhecimento e Histórico...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
+            # Se der erro 404/Not Found, altere 'gemini-2.5-flash' para 'gemini-1.5-flash'
             model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
             
             prompt_parts = [BASE_CONHECIMENTO]
+            prompt_parts.append(EXEMPLOS_TREINAMENTO) 
 
             if vistoria_entrada:
                 prompt_parts.append("CONTEXTO: ENTRADA")
