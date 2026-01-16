@@ -3,12 +3,15 @@ import google.generativeai as genai
 import pandas as pd
 import io
 
-# --- 1. SUA CHAVE API ---
-# Correção: Use o NOME da variável, não a chave em si
-CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
+# --- 1. CONFIGURAÇÃO INICIAL ---
+try:
+    CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
+except:
+    st.error("❌ Erro de Chave: Configure a 'CHAVE_SECRETA' nos Secrets do Streamlit.")
+    st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (Termo Oficial)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V20)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -31,7 +34,7 @@ st.markdown("""
             background-color: #e55800;
             color: white;
         }
-
+        
         /* CARD VISUAL */
         .card { padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 5px solid; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; font-size: 14px; background-color: #1e1e1e; }
         .card-green { border-color: #28a745; color: #e6ffe6; }
@@ -48,77 +51,52 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (COM FRASES JURÍDICAS OBRIGATÓRIAS) ---
+# --- 3. BASE DE CONHECIMENTO (REGRAS DE PINTURA ATUALIZADAS) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
 Sua análise deve ser estritamente baseada nas regras abaixo.
 
---- 1. DESGASTES NATURAIS & AÇÃO DO TEMPO (NEGAR) ---
-O que é: Deterioramento normal pelo tempo, sol, chuva ou uso regular.
-Itens:
-- Pintura desbotada, descascada por umidade natural ou tempo.
-- Marcas leves no piso.
-- Torneiras/Chuveiros pingando (vedante) ou com desgaste de uso.
-- Lâmpadas queimadas.
-- Encardido de rejunte, bolor ou mofo por falta de ventilação estrutural.
-- Ferrugem/Oxidação em metais (portões, maçanetas).
-- Itens externos (portões, grades, calçadas) com pintura gasta.
+--- 1. REGRA DE OURO: PINTURA INTERNA (SEMPRE APROVAR) ---
+Qualquer pintura de PAREDES, TETOS, PORTAS ou JANELAS que fiquem DENTRO do imóvel (Interno ou com cobertura) deve ser APROVADA.
+Não importa se a justificativa é "sujeira", "furos", "riscos" ou "tempo". Pintura interna é responsabilidade do inquilino entregar nova.
+✅ STATUS: Aprovado
 
-❌ MOTIVO DA NEGATIVA (Copie EXATAMENTE):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
+--- 2. REGRA: PINTURA EXTERNA (SEM COBERTURA -> NEGAR) ---
+Apenas pinturas de itens expostos ao tempo (sem telhado/cobertura) devem ser negadas por ação do tempo.
+Itens: Fachada do prédio, Muros externos, Calçadas, Portões de garagem expostos à chuva/sol.
+❌ STATUS: Negado
+❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura, umidade..."
 
---- 2. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
-O que é: Itens que podem ser removidos sem dano à estrutura.
-Itens: Sofás, camas, mesas, cadeiras, cortinas, persianas, tapetes, eletrodomésticos (geladeira, fogão), controle remoto, decoração.
+--- 3. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
+Itens móveis: Sofás, camas, mesas, cadeiras, cortinas, persianas, tapetes, eletrodomésticos.
+❌ STATUS: Negado
+❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 
-❌ MOTIVO DA NEGATIVA (Copie EXATAMENTE):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+--- 4. REDES HIDRÁULICAS E ELÉTRICAS (ANÁLISE MISTA) ---
+A) NEGAR (Vício Oculto/Interno): Fiação dentro da parede, resistência queimada, vazamento oculto, cano estourado.
+❌ MOTIVO: "Pagamento negado... danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes..."
 
---- 3. REDES HIDRÁULICAS E ELÉTRICAS (ANÁLISE MISTA) ---
-A) NEGAR (Desgaste/Vício Oculto):
-- Fiação antiga, curto interno na parede, resistência de chuveiro queimada, vazamento interno (cano estourado na parede), flexível ressecado.
-❌ MOTIVO DA NEGATIVA (Copie EXATAMENTE):
-"Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+B) APROVAR (Mau Uso Aparente): Tomadas/Interruptores quebrados, arrancados ou pintados. Torneiras/Louças quebradas fisicamente.
+✅ STATUS: Aprovado
 
-B) APROVAR (Mau Uso/Dano Aparente):
-- Tomadas/Interruptores quebrados, arrancados ou pintados.
-- Torneiras quebradas fisicamente (alavanca solta).
-- Louças (pia/vaso) quebradas por impacto.
-✅ MOTIVO: "Dano físico aparente causado por mau uso."
-
---- 4. ATO ILÍCITO / ITENS RETIRADOS (NEGAR) ---
-O que é: Itens que foram FURTADOS ou RETIRADOS do imóvel pelo inquilino.
-Atenção: Se o item está lá mas está QUEBRADO, é Mau Uso (Aprovar). Se o item SUMIU, é Ato Ilícito (Negar).
-
-❌ MOTIVO DA NEGATIVA (Copie EXATAMENTE):
-"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
-
---- 5. DANOS POR TERCEIROS (NEGAR) ---
-O que é: Danos causados por imobiliária, corretores ou prestadores de serviço do proprietário.
-❌ MOTIVO DA NEGATIVA: "Dano causado por terceiros não vinculados ao contrato de locação."
-
---- 6. O QUE APROVAR (MAU USO COMPROVADO) ---
-Classificar como "Aprovado" (Verde):
-- Paredes: Furos excessivos, riscos de caneta, sujeira pesada, mudança de cor não autorizada.
-- Pisos: Lascados, quebrados, queimados ou com manchas químicas.
-- Portas/Janelas: Vidros quebrados, fechaduras quebradas por força, madeira arranhada profundamente (cães).
-- Fixos: Armários embutidos quebrados (portas arrancadas, gavetas quebradas).
-- Caçambas: Apenas se vinculadas a reparos aprovados e valor < R$ 400.
+--- 5. ATO ILÍCITO / ITENS RETIRADOS (NEGAR) ---
+Se o item foi FURTADO ou RETIRADO.
+❌ MOTIVO: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
 
 --- FORMATO DE SAÍDA (JSON) ---
 [
   {
-    "Item": "Texto original do orçamento",
+    "Item": "Texto original",
     "Valor": 0.00,
     "Status": "Aprovado / Atenção / Negado",
-    "Motivo": "Use OBRIGATORIAMENTE as frases de negativa acima se for Negado. Se Aprovado, descreva o mau uso."
+    "Motivo": "Justificativa curta"
   }
 ]
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (Jurídico V18)")
-st.caption("Baseada no Termo de Cobertura Loft Fiança")
+st.title("🏢 Analisador Loft (V20 - Pintura Correta)")
+st.caption("Regra de Pintura Interna Atualizada: Sempre Aprovar.")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -135,13 +113,13 @@ with tab_arq:
     orcamento_arquivo = st.file_uploader("Upload Orçamento", type=['pdf', 'jpg', 'png'], key="orcamento")
 
 # --- 5. PROCESSAMENTO ---
-if st.button("⚡ ANALISAR CONFORME TERMO"):
+if st.button("⚡ ANALISAR AGORA"):
     
     if not (orcamento_texto or orcamento_arquivo):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Aplicando regras jurídicas Loft...", expanded=True) as status:
+    with st.status("⚖️ Verificando regras de pintura...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
@@ -166,7 +144,7 @@ if st.button("⚡ ANALISAR CONFORME TERMO"):
             response = model.generate_content(prompt_parts)
             df = pd.read_json(io.StringIO(response.text))
             
-            status.update(label="✅ Análise Jurídica Concluída!", state="complete", expanded=False)
+            status.update(label="✅ Análise Concluída!", state="complete", expanded=False)
 
             # --- 6. VISUALIZAÇÃO ---
             st.divider()
@@ -176,49 +154,55 @@ if st.button("⚡ ANALISAR CONFORME TERMO"):
             negados = df[df['Status'].str.contains("Negado", case=False)]
 
             if not aprovados.empty:
-                st.markdown('<div class="section-title green-text">✅ APROVADOS (Mau Uso / Danos)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title green-text">✅ APROVADOS (Cobrança Devida)</div>', unsafe_allow_html=True)
                 for i, row in aprovados.iterrows():
-                    st.markdown(f'<div class="card card-green"><div>{row["Item"]} <span class="badge bg-green">FOTO</span></div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="card card-green"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
             if not atencao.empty:
-                st.markdown('<div class="section-title yellow-text">⚠️ ATENÇÃO (Verificar Documentação)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title yellow-text">⚠️ ATENÇÃO (Validar)</div>', unsafe_allow_html=True)
                 for i, row in atencao.iterrows():
-                    st.markdown(f'<div class="card card-yellow"><div>{row["Item"]} <span class="badge bg-yellow">VERIFICAR</span><br><small>{row["Motivo"]}</small></div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="card card-yellow"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
             if not negados.empty:
-                st.markdown('<div class="section-title red-text">⛔ NEGADOS (Termo Loft)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title red-text">⛔ NEGADOS (Conforme Termo)</div>', unsafe_allow_html=True)
                 for i, row in negados.iterrows():
-                    st.markdown(f'<div class="card card-red"><div>{row["Item"]}<br><small>Motivo: {row["Motivo"]}</small></div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="card card-red"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
-            # --- 7. COPY AREA (TEXTO SIMPLES PARA ONENOTE) ---
+            # --- 7. ÁREA DE CÓPIA PARA ONENOTE ---
             st.divider()
-            st.subheader("📋 Relatório Oficial Loft")
+            st.subheader("📋 Relatório Final (Para OneNote)")
+            st.info("💡 Passe o mouse no canto da caixa preta para copiar.")
+
+            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n"
+            relatorio += "========================================\n\n"
             
-            relatorio = "RELATÓRIO DE ANÁLISE - LOFT FIANÇA\n====================================\n\n"
             if not aprovados.empty:
                 relatorio += "✅ APROVADOS:\n"
                 for i, r in aprovados.iterrows():
-                    relatorio += f"• {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    # Removemos a justificativa dos aprovados para ficar mais limpo, se quiser pode voltar
                 relatorio += "\n"
             
             if not atencao.empty:
-                relatorio += "⚠️ ATENÇÃO (VALIDAR):\n"
+                relatorio += "⚠️ ATENÇÃO:\n"
                 for i, r in atencao.iterrows():
-                    relatorio += f"• {r['Item']} | R$ {r['Valor']:.2f} ({r['Motivo']})\n"
+                    relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    relatorio += f"    Motivo: {r['Motivo']}\n"
                 relatorio += "\n"
 
             if not negados.empty:
-                relatorio += "⛔ NEGADOS (CONF. TERMO):\n"
+                relatorio += "⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
-                    relatorio += f"• {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    relatorio += f"  MOTIVO: {r['Motivo']}\n"
+                    relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    relatorio += f"    Justificativa: {r['Motivo']}\n"
             
-            total_geral = aprovados['Valor'].sum()
+            total_aprovado = aprovados['Valor'].sum()
             total_negado = negados['Valor'].sum()
             
-            relatorio += "\n===================================="
-            relatorio += f"\nTOTAL APROVADO: R$ {total_geral:.2f}"
-            relatorio += f"\nTOTAL NEGADO:   R$ {total_negado:.2f}"
+            relatorio += "\n========================================\n"
+            relatorio += f"💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n"
+            relatorio += f"📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}\n"
+            relatorio += "========================================"
 
             st.code(relatorio, language='text')
 
