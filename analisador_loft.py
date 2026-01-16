@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V20)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V22)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
@@ -51,36 +51,44 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. BASE DE CONHECIMENTO (REGRAS DE PINTURA ATUALIZADAS) ---
+# --- 3. BASE DE CONHECIMENTO (V22 - REGRA BLINDADA DE LIMPEZA) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Sua análise deve ser estritamente baseada nas regras abaixo.
+Analise cada item do orçamento aplicando estritamente as regras abaixo.
 
---- 1. REGRA DE OURO: PINTURA INTERNA (SEMPRE APROVAR) ---
-Qualquer pintura de PAREDES, TETOS, PORTAS ou JANELAS que fiquem DENTRO do imóvel (Interno ou com cobertura) deve ser APROVADA.
-Não importa se a justificativa é "sujeira", "furos", "riscos" ou "tempo". Pintura interna é responsabilidade do inquilino entregar nova.
-✅ STATUS: Aprovado
+--- 1. LIMPEZA (REGRA SUPREMA: APROVAR) ---
+A regra de "Desgaste Natural" NÃO se aplica a sujeira.
+Conforme o termo, "Falta de manutenção adequada (limpeza)" é responsabilidade do inquilino.
+✅ ITENS PARA APROVAR:
+- "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza de vidros".
+- "Limpeza externa" (frente/fundos/quintal).
+- "Limpeza de caixa de gordura" (Entupimentos ou falta de limpeza são cobráveis).
+- "Retirada de lixo/entulho" (do inquilino).
+MOTIVO A USAR: "Falta de manutenção adequada (Imóvel entregue sujo/sem conservação)."
 
---- 2. REGRA: PINTURA EXTERNA (SEM COBERTURA -> NEGAR) ---
-Apenas pinturas de itens expostos ao tempo (sem telhado/cobertura) devem ser negadas por ação do tempo.
-Itens: Fachada do prédio, Muros externos, Calçadas, Portões de garagem expostos à chuva/sol.
+--- 2. PINTURA INTERNA (APROVAR) ---
+Pintura de PAREDES, TETOS, PORTAS ou JANELAS (Lado interno) deve ser paga pelo inquilino.
+Se o item é "Pintura Parede", "Pintura Teto" ou "Pintura Porta", o Status é APROVADO.
+MOTIVO A USAR: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
+
+--- 3. PINTURA EXTERNA (NEGAR SE NÃO TIVER COBERTURA) ---
+Apenas pinturas de itens expostos ao tempo (sem telhado) devem ser negadas.
+Itens: Fachada do prédio, Muros externos, Calçadas, Portões de garagem expostos.
 ❌ STATUS: Negado
-❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura, umidade..."
+❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura e umidade."
 
---- 3. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
-Itens móveis: Sofás, camas, mesas, cadeiras, cortinas, persianas, tapetes, eletrodomésticos.
+--- 4. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
+Itens móveis: Sofás, camas, mesas, cadeiras, cortinas, persianas, tapetes, eletrodomésticos, TVs.
 ❌ STATUS: Negado
 ❌ MOTIVO: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 
---- 4. REDES HIDRÁULICAS E ELÉTRICAS (ANÁLISE MISTA) ---
-A) NEGAR (Vício Oculto/Interno): Fiação dentro da parede, resistência queimada, vazamento oculto, cano estourado.
-❌ MOTIVO: "Pagamento negado... danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes..."
+--- 5. REDES HIDRÁULICAS E ELÉTRICAS ---
+A) NEGAR (Vício Oculto): Fiação interna, resistência queimada, vazamento dentro da parede, cano PVC oculto.
+   MOTIVO: "Pagamento negado... danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes..."
+B) APROVAR (Dano Físico): Tomadas quebradas, Torneiras quebradas/soltas, Louças quebradas.
 
-B) APROVAR (Mau Uso Aparente): Tomadas/Interruptores quebrados, arrancados ou pintados. Torneiras/Louças quebradas fisicamente.
-✅ STATUS: Aprovado
-
---- 5. ATO ILÍCITO / ITENS RETIRADOS (NEGAR) ---
-Se o item foi FURTADO ou RETIRADO.
+--- 6. ATO ILÍCITO / ITENS RETIRADOS (NEGAR) ---
+Se o orçamento diz "Remover" itens que o inquilino instalou indevidamente, ou repor itens furtados.
 ❌ MOTIVO: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
 
 --- FORMATO DE SAÍDA (JSON) ---
@@ -95,8 +103,8 @@ Se o item foi FURTADO ou RETIRADO.
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V20 - Pintura Correta)")
-st.caption("Regra de Pintura Interna Atualizada: Sempre Aprovar.")
+st.title("🏢 Analisador Loft (V22 - Limpeza Corrigida)")
+st.caption("Correção: Limpeza (Interna, Externa e Caixa de Gordura) agora é APROVADA por falta de manutenção.")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -119,7 +127,7 @@ if st.button("⚡ ANALISAR AGORA"):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Verificando regras de pintura...", expanded=True) as status:
+    with st.status("⚖️ Verificando regras de Limpeza e Manutenção...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
@@ -180,7 +188,6 @@ if st.button("⚡ ANALISAR AGORA"):
                 relatorio += "✅ APROVADOS:\n"
                 for i, r in aprovados.iterrows():
                     relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    # Removemos a justificativa dos aprovados para ficar mais limpo, se quiser pode voltar
                 relatorio += "\n"
             
             if not atencao.empty:
