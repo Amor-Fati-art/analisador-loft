@@ -11,18 +11,38 @@ except:
     st.stop()
 
 # --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V31 - Correção Reposição)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Analisador Loft (V23)", page_icon="🏢", layout="wide")
 
 st.markdown("""
     <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        
         div.stButton > button:first-child {
-            background-color: #ff6200; color: white; font-weight: bold; border: none; width: 100%; padding: 15px; font-size: 18px; text-transform: uppercase; border-radius: 8px;
+            background-color: #ff6200;
+            color: white;
+            font-weight: bold;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            text-transform: uppercase;
+            border-radius: 8px;
         }
-        div.stButton > button:first-child:hover { background-color: #e55800; color: white; }
+        div.stButton > button:first-child:hover {
+            background-color: #e55800;
+            color: white;
+        }
+        
+        /* CARD VISUAL */
         .card { padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 5px solid; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; font-size: 14px; background-color: #1e1e1e; }
         .card-green { border-color: #28a745; color: #e6ffe6; }
         .card-yellow { border-color: #ffc107; color: #fffbe6; }
         .card-red { border-color: #dc3545; color: #ffe6e6; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; text-transform: uppercase; color: black; }
+        .bg-green { background-color: #28a745; color: white; }
+        .bg-yellow { background-color: #ffc107; }
         .card-price { font-weight: bold; font-size: 15px; min-width: 80px; text-align: right; }
         .section-title { margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 16px; }
         .green-text { color: #28a745; }
@@ -31,147 +51,101 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. REGRAS E CÉREBRO DA IA ---
-
-# REGRA 0: Só ativa se tiver Vistoria de Entrada
-REGRA_COMPARACAO = """
---- 0. REGRA DE OURO: DANO PRÉ-EXISTENTE (MODO COMPARATIVO ATIVO) ---
-O USUÁRIO FORNECEU A VISTORIA DE ENTRADA. SUA OBRIGAÇÃO É COMPARAR.
-Antes de aprovar qualquer item, verifique a VISTORIA DE ENTRADA fornecida.
-Se o item já estava descrito como "Desgastado", "Ruim", "Manchado", "Riscado" ou "Danificado" na ENTRADA e não houve piora significativa:
-❌ STATUS: Negado
-❌ MOTIVO (Copiar exatamente):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
-"""
-
-# BASE DE CONHECIMENTO V31 (COM SEPARAÇÃO DE REPOSIÇÃO/MOBÍLIA)
+# --- 3. BASE DE CONHECIMENTO (V23 - CRUZAMENTO ENTRADA x SAÍDA) ---
 BASE_CONHECIMENTO = """
 VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Analise cada item do orçamento aplicando estritamente as regras abaixo.
-Se for NEGAR, use EXATAMENTE as frases (IDs) abaixo.
+Sua missão principal é comparar Vistoria de Entrada vs. Saída.
 
---- 1. LIMPEZA (APROVAR) ---
-✅ APROVAR: "Limpeza interna", "Faxina", "Limpeza pesada", "Limpeza externa" (piso/entulho), "Caixa de gordura", "Bota-fora".
-MOTIVO: "Falta de manutenção adequada (limpeza)."
+--- 🔴 REGRA ZERO (A MAIS IMPORTANTE): CRUZAMENTO DE DADOS ---
+Antes de aprovar qualquer item, verifique a "Vistoria de Entrada" (se fornecida).
+SE O DANO JÁ EXISTIA NA ENTRADA (Mesmo estado, risco, mancha ou quebra) -> O STATUS DEVE SER NEGADO.
+Não importa se é pintura interna ou limpeza. Se já estava assim, o inquilino não paga.
+❌ MOTIVO: "Dano pré-existente (Já constava na Vistoria de Entrada)."
 
---- 2. PINTURA INTERNA (APROVAR) ---
-✅ APROVAR: Paredes, Tetos, Portas (Lado interno).
-MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
+--- 1. LIMPEZA (Se não for pré-existente -> APROVAR) ---
+Se o imóvel foi entregue limpo e devolvido sujo:
+✅ ITENS: "Limpeza interna/externa", "Faxina", "Retirada de lixo/entulho", "Caixa de gordura".
+✅ MOTIVO: "Falta de manutenção adequada (Imóvel entregue sujo)."
 
---- 3. RESTITUIÇÃO (APROVAR) ---
-✅ APROVAR: "Remover Canil", "Remover Divisória", "Remover Varal", "Remover Telas".
-MOTIVO: "Restituição do imóvel ao estado original (Remoção de benfeitoria não autorizada)."
+--- 2. PINTURA INTERNA (Se não for pré-existente -> APROVAR) ---
+Pintura de PAREDES, TETOS, PORTAS (Lado interno).
+Se na entrada estava bom e na saída tem riscos/sujeira/furos:
+✅ STATUS: Aprovado
+✅ MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
 
---- ⚠️ REGRAS DE NEGATIVA (USE O TEXTO EXATO DO TIPO CORRETO) ⚠️ ---
+--- 3. PINTURA EXTERNA (SEM COBERTURA -> NEGAR) ---
+Itens expostos a chuva/sol (Muros, Fachadas, Portões externos).
+❌ STATUS: Negado
+❌ MOTIVO: "Pagamento negado... danos causados pela ação paulatina de temperatura e umidade."
 
-🔴 TIPO A: EXTERNO / JARDIM / TEMPO
-Use para: Fachada, Muros, Telhados, Calhas, Mato, Jardim, Ação do Sol/Chuva.
-❌ MOTIVO OBRIGATÓRIO (Copiar ID A):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
+--- 4. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
+Sofás, cortinas, eletros, móveis soltos.
+❌ STATUS: Negado
+❌ MOTIVO: "Pagamento negado... item não fixo/mobília."
 
-🔴 TIPO B: ELÉTRICA / HIDRÁULICA OCULTA
-Use para: Fiação interna, Alarme, Interfone, Cano dentro da parede.
-❌ MOTIVO OBRIGATÓRIO (Copiar ID B):
-"Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
+--- 5. REDES HIDRÁULICAS E ELÉTRICAS ---
+A) NEGAR (Vício Oculto): Fiação interna, cano estourado dentro da parede.
+B) APROVAR (Dano Físico): Tomadas quebradas, Torneiras soltas, Louças quebradas.
 
-🔴 TIPO C: ATO ILÍCITO / ITEM FALTANTE (REPOR)
-Use OBRIGATORIAMENTE se o item começa com "REPOR", "COLOCAR" ou "FALTANDO" (Ex: Repor cortina, Repor faca, Repor torneira roubada).
-Isso não é desgaste, é subtração de item.
-❌ MOTIVO OBRIGATÓRIO (Copiar ID C):
-"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
-
-🔴 TIPO D: DESGASTE DE ACABAMENTOS (Piso/Parede)
-Use para: Riscos leves no piso, lâmpadas queimadas, desgaste natural de uso.
-❌ MOTIVO OBRIGATÓRIO (Copiar ID D):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
-
-🔴 TIPO E: MOBÍLIA / UTENSÍLIOS (Itens Móveis)
-Use para: Cama, Sofá, Mesa, Cortina, Prateleira solta, Eletrodomésticos, Facas, Espetos.
-(Itens que não são fixos na estrutura do imóvel).
-❌ MOTIVO OBRIGATÓRIO (Copiar ID D - O termo usa o mesmo texto de desgaste, mas a lógica é de item não fixo):
-"Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+--- 6. ATO ILÍCITO (Itens Furtados/Retirados) ---
+❌ STATUS: Negado
+❌ MOTIVO: "Danos causados por atos ilícitos (Item retirado/furtado)..."
 
 --- FORMATO DE SAÍDA (JSON) ---
-[ { "Item": "Texto original", "Valor": 0.00, "Status": "Aprovado / Negado", "Motivo": "Cole o texto do TIPO A, B, C, D ou E aqui" } ]
-"""
-
-# --- AREA DE TREINAMENTO ---
-EXEMPLOS_TREINAMENTO = """
-AQUI ESTÃO EXEMPLOS DE ANÁLISES REAIS (GABARITO):
-
-CASO 1 (JARDIM/TEMPO):
-Item: "Limpeza Mato" -> NEGADO (TIPO A - Ação do tempo)
-Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel... danos causados pela ação paulatina de temperatura..."
-
-CASO 2 (REPOSIÇÃO = ATO ILÍCITO):
-Item: "Repor cortina bege" -> NEGADO (TIPO C - Ato Ilícito/Falta)
-Motivo: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
-
-Item: "Repor 1 faca e 1 espeto" -> NEGADO (TIPO C - Ato Ilícito/Falta)
-Motivo: "Danos causados por atos ilícitos, dolosos ou por culpa grave..."
-
-CASO 3 (MOBÍLIA DANIFICADA):
-Item: "Cama box Danificado" -> NEGADO (TIPO E - Mobília)
-Motivo: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel..."
-
-CASO 4 (RESTITUIÇÃO):
-Item: "Remover 07 Canil Cimento" -> APROVADO (Restituição ao estado original).
-
-CASO 5 (ANIMAIS):
-Item: "Pintura das paredes e portões - danificados por xixi de cachorro" -> APROVADO (Danos causados por animais de estimação).
-
-*** COLE SEUS EXEMPLOS DO ONENOTE AQUI ABAIXO ***
-
+[
+  {
+    "Item": "Texto original",
+    "Valor": 0.00,
+    "Status": "Aprovado / Atenção / Negado",
+    "Motivo": "Justificativa curta"
+  }
+]
 """
 
 # --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V31 - Reposição Corrigida)")
-st.caption("Correção: 'Repor' = Ato Ilícito | Mobília separada de Desgaste.")
+st.title("🏢 Analisador Loft (V23 - Comparador Inteligente)")
+st.caption("Regra Suprema Ativa: Se o dano já existia na entrada, o sistema NEGA automaticamente.")
 
 col1, col2 = st.columns(2)
 with col1:
-    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Ativa Regra 0)", type=['pdf', 'jpg', 'png'], key="entrada")
+    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Obrigatório p/ Comparar)", type=['pdf', 'jpg', 'png'], key="entrada")
 with col2:
-    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída (Opcional)", type=['pdf', 'jpg', 'png'], key="saida")
+    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída", type=['pdf', 'jpg', 'png'], key="saida")
 
 st.markdown("---")
 st.markdown("### 💰 3. Orçamento")
 tab_txt, tab_arq = st.tabs(["📝 Colar Texto", "📂 Anexar Arquivo"])
 with tab_txt:
-    orcamento_texto = st.text_area("Cole aqui:", height=150, placeholder="Ex: Item 1... R$ 100,00", label_visibility="collapsed")
+    orcamento_texto = st.text_area("Cole aqui:", height=150, placeholder="Ex: Pintura Sala... R$ 500,00", label_visibility="collapsed")
 with tab_arq:
     orcamento_arquivo = st.file_uploader("Upload Orçamento", type=['pdf', 'jpg', 'png'], key="orcamento")
 
 # --- 5. PROCESSAMENTO ---
-if st.button("⚡ ANALISAR AGORA"):
+if st.button("⚡ ANALISAR CRUZAMENTO DE DADOS"):
     
     if not (orcamento_texto or orcamento_arquivo):
         st.error("⚠️ Insira o orçamento.")
         st.stop()
 
-    with st.status("⚖️ Processando...", expanded=True) as status:
+    with st.status("🧠 Cruzando Vistoria de Entrada vs. Saída...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
+            
             model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
             
-            prompt_parts = []
+            prompt_parts = [BASE_CONHECIMENTO]
 
             if vistoria_entrada:
-                prompt_parts.append(REGRA_COMPARACAO)
-                st.toast("Modo Comparativo: ATIVADO ✅")
-            
-            prompt_parts.append(BASE_CONHECIMENTO)
-            prompt_parts.append(EXEMPLOS_TREINAMENTO)
-
-            if vistoria_entrada:
-                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA")
+                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA (PROVA DO ESTADO INICIAL)")
                 prompt_parts.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
+            else:
+                prompt_parts.append("AVISO: SEM VISTORIA DE ENTRADA. APLIQUE REGRAS PADRÃO.")
             
             if vistoria_saida:
-                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE SAÍDA")
+                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE SAÍDA (ESTADO FINAL)")
                 prompt_parts.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
 
-            prompt_parts.append("ORÇAMENTO A ANALISAR:")
+            prompt_parts.append("ORÇAMENTO A ANALISAR (Compare com a Entrada se houver):")
             if orcamento_arquivo:
                 prompt_parts.append({"mime_type": orcamento_arquivo.type, "data": orcamento_arquivo.getvalue()})
             else:
@@ -180,7 +154,7 @@ if st.button("⚡ ANALISAR AGORA"):
             response = model.generate_content(prompt_parts)
             df = pd.read_json(io.StringIO(response.text))
             
-            status.update(label="✅ Análise Concluída!", state="complete", expanded=False)
+            status.update(label="✅ Comparação Concluída!", state="complete", expanded=False)
 
             # --- 6. VISUALIZAÇÃO ---
             st.divider()
@@ -190,24 +164,27 @@ if st.button("⚡ ANALISAR AGORA"):
             negados = df[df['Status'].str.contains("Negado", case=False)]
 
             if not aprovados.empty:
-                st.markdown('<div class="section-title green-text">✅ APROVADOS (Cobrança Devida)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title green-text">✅ APROVADOS (Dano Novo / Sujeira Nova)</div>', unsafe_allow_html=True)
                 for i, row in aprovados.iterrows():
                     st.markdown(f'<div class="card card-green"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
             if not atencao.empty:
-                st.markdown('<div class="section-title yellow-text">⚠️ ATENÇÃO (Validar)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title yellow-text">⚠️ ATENÇÃO (Verificar)</div>', unsafe_allow_html=True)
                 for i, row in atencao.iterrows():
                     st.markdown(f'<div class="card card-yellow"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
             if not negados.empty:
-                st.markdown('<div class="section-title red-text">⛔ NEGADOS (Conforme Termo)</div>', unsafe_allow_html=True)
+                st.markdown('<div class="section-title red-text">⛔ NEGADOS (Pré-existente ou Indevido)</div>', unsafe_allow_html=True)
                 for i, row in negados.iterrows():
-                    st.markdown(f'<div class="card card-red"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="card card-red"><div>{row["Item"]}<br><small>Motivo: {row["Motivo"]}</small></div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
 
-            # --- 7. RELATÓRIO ---
+            # --- 7. COPY AREA ---
             st.divider()
             st.subheader("📋 Relatório Final")
-            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n========================================\n\n"
+            st.info("💡 Passe o mouse na caixa preta para copiar.")
+
+            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n"
+            relatorio += "========================================\n\n"
             
             if not aprovados.empty:
                 relatorio += "✅ APROVADOS:\n"
@@ -215,6 +192,13 @@ if st.button("⚡ ANALISAR AGORA"):
                     relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
                 relatorio += "\n"
             
+            if not atencao.empty:
+                relatorio += "⚠️ ATENÇÃO:\n"
+                for i, r in atencao.iterrows():
+                    relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    relatorio += f"    Motivo: {r['Motivo']}\n"
+                relatorio += "\n"
+
             if not negados.empty:
                 relatorio += "⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
@@ -224,10 +208,14 @@ if st.button("⚡ ANALISAR AGORA"):
             total_aprovado = aprovados['Valor'].sum()
             total_negado = negados['Valor'].sum()
             
-            relatorio += f"\n💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}"
+            relatorio += "\n========================================\n"
+            relatorio += f"💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n"
+            relatorio += f"📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}\n"
+            relatorio += "========================================"
+
             st.code(relatorio, language='text')
 
         except Exception as e:
             status.update(label="❌ Erro", state="error")
-            st.error("Erro ao processar.")
+            st.error("Erro ao processar. Verifique os arquivos.")
             st.write(e)
