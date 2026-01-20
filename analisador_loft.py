@@ -3,219 +3,209 @@ import google.generativeai as genai
 import pandas as pd
 import io
 
-# --- 1. CONFIGURAÇÃO INICIAL ---
+# --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
 try:
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except:
-    st.error("❌ Erro de Chave: Configure a 'CHAVE_SECRETA' nos Secrets do Streamlit.")
+    st.error("❌ Erro: Configure a 'CHAVE_SECRETA' nos Secrets do Streamlit.")
     st.stop()
 
-# --- 2. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(page_title="Analisador Loft (V23)", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-st.markdown("""
-    <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-        
-        div.stButton > button:first-child {
-            background-color: #ff6200;
-            color: white;
-            font-weight: bold;
-            border: none;
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            text-transform: uppercase;
-            border-radius: 8px;
-        }
-        div.stButton > button:first-child:hover {
-            background-color: #e55800;
-            color: white;
-        }
-        
-        /* CARD VISUAL */
-        .card { padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 5px solid; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; font-size: 14px; background-color: #1e1e1e; }
-        .card-green { border-color: #28a745; color: #e6ffe6; }
-        .card-yellow { border-color: #ffc107; color: #fffbe6; }
-        .card-red { border-color: #dc3545; color: #ffe6e6; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 10px; text-transform: uppercase; color: black; }
-        .bg-green { background-color: #28a745; color: white; }
-        .bg-yellow { background-color: #ffc107; }
-        .card-price { font-weight: bold; font-size: 15px; min-width: 80px; text-align: right; }
-        .section-title { margin-top: 20px; font-weight: bold; text-transform: uppercase; font-size: 16px; }
-        .green-text { color: #28a745; }
-        .yellow-text { color: #ffc107; }
-        .red-text { color: #dc3545; }
-    </style>
-""", unsafe_allow_html=True)
+# ==============================================================================
+# 🔴 ÁREA DE TREINAMENTO (Seu Histórico do OneNote)
+# ==============================================================================
+# Cole abaixo os exemplos de casos que você já resolveu.
+# A IA vai usar isso para copiar o seu estilo de decisão.
+# ==============================================================================
+EXEMPLOS_TREINAMENTO = """
+--- EXEMPLO 1 ---
+Item: Pintura de Fachada Externa
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, danos causados pela ação paulatina de temperatura e umidade.
 
-# --- 3. BASE DE CONHECIMENTO (V23 - CRUZAMENTO ENTRADA x SAÍDA) ---
+--- EXEMPLO 2 ---
+Item: Troca de Lâmpadas LED
+Decisão: NEGADO
+Motivo: Pagamento negado. Lâmpada é item de consumo e desgaste natural.
+
+--- EXEMPLO 3 ---
+Item: Pintura Interna (Sala com riscos de caneta)
+Decisão: APROVADO
+Motivo: Pintura interna danificada por mau uso (riscos), diferindo da vistoria de entrada.
+
+--- EXEMPLO 4 ---
+Item: Limpeza Pesada e Remoção de Lixo
+Decisão: APROVADO
+Motivo: Imóvel entregue limpo e devolvido sujo com pertences.
+
+--- EXEMPLO 5 ---
+Item: Cortina da Sala Rasgada
+Decisão: NEGADO
+Motivo: Pagamento negado... item não fixo/mobília.
+
+(Você pode colar mais exemplos aqui embaixo seguindo esse padrão...)
+"""
+# ==============================================================================
+
+
+# ==============================================================================
+# 🔵 BASE DE CONHECIMENTO (Regras Oficiais Loft Fiança)
+# ==============================================================================
 BASE_CONHECIMENTO = """
-VOCÊ É O AUDITOR OFICIAL DA LOFT FIANÇA.
-Sua missão principal é comparar Vistoria de Entrada vs. Saída.
+VOCÊ É UM AUDITOR TÉCNICO DA LOFT FIANÇA.
+Sua missão é analisar orçamentos de reparo comparando Vistoria de Entrada vs. Saída.
 
---- 🔴 REGRA ZERO (A MAIS IMPORTANTE): CRUZAMENTO DE DADOS ---
-Antes de aprovar qualquer item, verifique a "Vistoria de Entrada" (se fornecida).
-SE O DANO JÁ EXISTIA NA ENTRADA (Mesmo estado, risco, mancha ou quebra) -> O STATUS DEVE SER NEGADO.
-Não importa se é pintura interna ou limpeza. Se já estava assim, o inquilino não paga.
-❌ MOTIVO: "Dano pré-existente (Já constava na Vistoria de Entrada)."
+REGRA DE OURO:
+1. Se o dano já existia na entrada (mesmo estado) -> NEGAR.
+2. Se o dano é desgaste natural (tempo) -> NEGAR.
+3. Se o dano é mau uso comprovado (mudança de estado) -> APROVAR.
 
---- 1. LIMPEZA (Se não for pré-existente -> APROVAR) ---
-Se o imóvel foi entregue limpo e devolvido sujo:
-✅ ITENS: "Limpeza interna/externa", "Faxina", "Retirada de lixo/entulho", "Caixa de gordura".
-✅ MOTIVO: "Falta de manutenção adequada (Imóvel entregue sujo)."
+REGRAS ESPECÍFICAS (COPIADAS DO TERMO):
 
---- 2. PINTURA INTERNA (Se não for pré-existente -> APROVAR) ---
-Pintura de PAREDES, TETOS, PORTAS (Lado interno).
-Se na entrada estava bom e na saída tem riscos/sujeira/furos:
-✅ STATUS: Aprovado
-✅ MOTIVO: "Pintura interna danificada/suja (Mau uso ou falta de conservação)."
+1. DESGASTES NATURAIS (NEGAR)
+   - Tinta desbotada, marcas leves de móveis, lâmpadas queimadas, encardido de rejunte.
+   - Frase Obrigatória: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 
---- 3. PINTURA EXTERNA (SEM COBERTURA -> NEGAR) ---
-Itens expostos a chuva/sol (Muros, Fachadas, Portões externos).
-❌ STATUS: Negado
-❌ MOTIVO: "Pagamento negado... danos causados pela ação paulatina de temperatura e umidade."
+2. AÇÃO DO TEMPO / ÁREA EXTERNA (NEGAR)
+   - Pintura externa, muros, fachadas, portões expostos, jardinagem (mato crescido).
+   - Frase Obrigatória: "Pagamento negado... danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração."
 
---- 4. ITENS NÃO FIXOS / MOBÍLIA (NEGAR) ---
-Sofás, cortinas, eletros, móveis soltos.
-❌ STATUS: Negado
-❌ MOTIVO: "Pagamento negado... item não fixo/mobília."
+3. ITENS NÃO FIXOS / MOBÍLIA (NEGAR)
+   - Sofás, cortinas soltas, eletros, móveis não planejados.
+   - Frase Obrigatória: "Pagamento negado... item não fixo/mobília."
 
---- 5. REDES HIDRÁULICAS E ELÉTRICAS ---
-A) NEGAR (Vício Oculto): Fiação interna, cano estourado dentro da parede.
-B) APROVAR (Dano Físico): Tomadas quebradas, Torneiras soltas, Louças quebradas.
+4. HIDRÁULICA E ELÉTRICA
+   - Oculto/Interno (Fiação, cano na parede) -> NEGAR (Estrutural).
+   - Visível/Uso (Tomada quebrada, sifão quebrado, louça sanitária quebrada) -> APROVAR (Mau uso).
+   - Frase Obrigatória se negar: "Pagamento negado... Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes."
 
---- 6. ATO ILÍCITO (Itens Furtados/Retirados) ---
-❌ STATUS: Negado
-❌ MOTIVO: "Danos causados por atos ilícitos (Item retirado/furtado)..."
+5. CAÇAMBAS E ENTULHOS
+   - Só aprovar se houver obras/reparos aprovados que gerem entulho.
+   - Se for apenas lixo do inquilino -> Aprovar como "Retirada de itens".
 
---- FORMATO DE SAÍDA (JSON) ---
+6. ATO ILÍCITO (Item Furtado)
+   - Confirmar se o item realmente sumiu comparando vistorias.
+   - Frase: "Danos causados por atos ilícitos..."
+
+FORMATO DE SAÍDA JSON:
 [
-  {
-    "Item": "Texto original",
-    "Valor": 0.00,
-    "Status": "Aprovado / Atenção / Negado",
-    "Motivo": "Justificativa curta"
-  }
+  {"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra"}
 ]
 """
 
-# --- 4. INTERFACE ---
-st.title("🏢 Analisador Loft (V23 - Comparador Inteligente)")
-st.caption("Regra Suprema Ativa: Se o dano já existia na entrada, o sistema NEGA automaticamente.")
+# --- INTERFACE VISUAL ---
+st.markdown("""
+    <style>
+        .card { padding: 10px; margin-bottom: 5px; border-radius: 5px; border-left: 5px solid; background-color: #262730; }
+        .card-green { border-color: #28a745; }
+        .card-red { border-color: #dc3545; }
+        .card-yellow { border-color: #ffc107; }
+        .price { float: right; font-weight: bold; }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🏢 Auditor Loft - Base Integrada")
+st.caption("Sistema carregado com: Base de Conhecimento Oficial + Seus Exemplos de Treinamento")
 
 col1, col2 = st.columns(2)
 with col1:
-    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Obrigatório p/ Comparar)", type=['pdf', 'jpg', 'png'], key="entrada")
+    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Opcional)", type=['pdf', 'txt'], key="ent")
 with col2:
-    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída", type=['pdf', 'jpg', 'png'], key="saida")
+    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída (Recomendado)", type=['pdf', 'txt'], key="sai")
 
-st.markdown("---")
-st.markdown("### 💰 3. Orçamento")
-tab_txt, tab_arq = st.tabs(["📝 Colar Texto", "📂 Anexar Arquivo"])
-with tab_txt:
-    orcamento_texto = st.text_area("Cole aqui:", height=150, placeholder="Ex: Pintura Sala... R$ 500,00", label_visibility="collapsed")
-with tab_arq:
-    orcamento_arquivo = st.file_uploader("Upload Orçamento", type=['pdf', 'jpg', 'png'], key="orcamento")
+st.markdown("### 📝 Orçamento para Análise")
+tab1, tab2 = st.tabs(["Digitar/Colar", "Upload Arquivo"])
+with tab1:
+    orcamento_txt = st.text_area("Cole os itens aqui:", height=150)
+with tab2:
+    orcamento_arq = st.file_uploader("Arquivo de Orçamento", type=['pdf', 'jpg'])
 
-# --- 5. PROCESSAMENTO ---
-if st.button("⚡ ANALISAR CRUZAMENTO DE DADOS"):
+# --- LÓGICA DE PROCESSAMENTO ---
+if st.button("🔍 ANALISAR AGORA"):
     
-    if not (orcamento_texto or orcamento_arquivo):
-        st.error("⚠️ Insira o orçamento.")
+    if not (orcamento_txt or orcamento_arq):
+        st.warning("Por favor, insira um orçamento.")
         st.stop()
 
-    with st.status("🧠 Cruzando Vistoria de Entrada vs. Saída...", expanded=True) as status:
+    with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
+        genai.configure(api_key=CHAVE_SECRETA)
+        model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+        
+        # Montagem do Prompt
+        prompt = [BASE_CONHECIMENTO]
+        
+        prompt.append("HISTÓRICO DE APRENDIZADO (USE ISSO COMO EXEMPLO DE DECISÃO):")
+        prompt.append(EXEMPLOS_TREINAMENTO)
+        
+        if vistoria_entrada:
+            prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
+            prompt.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
+        
+        if vistoria_saida:
+            prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
+            prompt.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
+            
+        prompt.append("ORÇAMENTO A ANALISAR:")
+        if orcamento_arq:
+            prompt.append({"mime_type": orcamento_arq.type, "data": orcamento_arq.getvalue()})
+        else:
+            prompt.append(orcamento_txt)
+            
         try:
-            genai.configure(api_key=CHAVE_SECRETA)
-            
-            model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json", "temperature": 0.0})
-            
-            prompt_parts = [BASE_CONHECIMENTO]
-
-            if vistoria_entrada:
-                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE ENTRADA (PROVA DO ESTADO INICIAL)")
-                prompt_parts.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
-            else:
-                prompt_parts.append("AVISO: SEM VISTORIA DE ENTRADA. APLIQUE REGRAS PADRÃO.")
-            
-            if vistoria_saida:
-                prompt_parts.append("CONTEXTO: DOCUMENTO DE VISTORIA DE SAÍDA (ESTADO FINAL)")
-                prompt_parts.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
-
-            prompt_parts.append("ORÇAMENTO A ANALISAR (Compare com a Entrada se houver):")
-            if orcamento_arquivo:
-                prompt_parts.append({"mime_type": orcamento_arquivo.type, "data": orcamento_arquivo.getvalue()})
-            else:
-                prompt_parts.append(orcamento_texto)
-
-            response = model.generate_content(prompt_parts)
+            response = model.generate_content(prompt)
             df = pd.read_json(io.StringIO(response.text))
+            status.update(label="✅ Análise Concluída", state="complete", expanded=False)
             
-            status.update(label="✅ Comparação Concluída!", state="complete", expanded=False)
-
-            # --- 6. VISUALIZAÇÃO ---
+            # --- RESULTADOS ---
             st.divider()
             
             aprovados = df[df['Status'].str.contains("Aprovado", case=False)]
-            atencao = df[df['Status'].str.contains("Atenção|Amarela", case=False)]
             negados = df[df['Status'].str.contains("Negado", case=False)]
-
+            atencao = df[df['Status'].str.contains("Atenção", case=False)]
+            
+            # Exibição Visual
             if not aprovados.empty:
-                st.markdown('<div class="section-title green-text">✅ APROVADOS (Dano Novo / Sujeira Nova)</div>', unsafe_allow_html=True)
-                for i, row in aprovados.iterrows():
-                    st.markdown(f'<div class="card card-green"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
-
-            if not atencao.empty:
-                st.markdown('<div class="section-title yellow-text">⚠️ ATENÇÃO (Verificar)</div>', unsafe_allow_html=True)
-                for i, row in atencao.iterrows():
-                    st.markdown(f'<div class="card card-yellow"><div>{row["Item"]}</div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                st.subheader("✅ Aprovados")
+                for i, r in aprovados.iterrows():
+                    st.markdown(f'<div class="card card-green"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
 
             if not negados.empty:
-                st.markdown('<div class="section-title red-text">⛔ NEGADOS (Pré-existente ou Indevido)</div>', unsafe_allow_html=True)
-                for i, row in negados.iterrows():
-                    st.markdown(f'<div class="card card-red"><div>{row["Item"]}<br><small>Motivo: {row["Motivo"]}</small></div><div class="card-price">R$ {row["Valor"]:.2f}</div></div>', unsafe_allow_html=True)
+                st.subheader("⛔ Negados")
+                for i, r in negados.iterrows():
+                    st.markdown(f'<div class="card card-red"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
+            
+            if not atencao.empty:
+                st.subheader("⚠️ Atenção")
+                for i, r in atencao.iterrows():
+                    st.markdown(f'<div class="card card-yellow"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
 
-            # --- 7. COPY AREA ---
+            # --- RELATÓRIO COPY/PASTE ---
             st.divider()
             st.subheader("📋 Relatório Final")
-            st.info("💡 Passe o mouse na caixa preta para copiar.")
-
-            relatorio = "RELATÓRIO DE ANÁLISE TÉCNICA - LOFT FIANÇA\n"
-            relatorio += "========================================\n\n"
+            
+            txt_relatorio = "RELATÓRIO TÉCNICO - ANÁLISE DE REPAROS\n"
+            txt_relatorio += "======================================\n"
             
             if not aprovados.empty:
-                relatorio += "✅ APROVADOS:\n"
+                txt_relatorio += "✅ APROVADOS:\n"
                 for i, r in aprovados.iterrows():
-                    relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                relatorio += "\n"
+                    txt_relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
             
-            if not atencao.empty:
-                relatorio += "⚠️ ATENÇÃO:\n"
-                for i, r in atencao.iterrows():
-                    relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    relatorio += f"    Motivo: {r['Motivo']}\n"
-                relatorio += "\n"
-
             if not negados.empty:
-                relatorio += "⛔ NEGADOS:\n"
+                txt_relatorio += "\n⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
-                    relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    relatorio += f"    Justificativa: {r['Motivo']}\n"
+                    txt_relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    txt_relatorio += f"    Motivo: {r['Motivo']}\n"
             
-            total_aprovado = aprovados['Valor'].sum()
-            total_negado = negados['Valor'].sum()
+            val_total = df['Valor'].sum()
+            val_aprov = aprovados['Valor'].sum()
             
-            relatorio += "\n========================================\n"
-            relatorio += f"💰 TOTAL APROVADO:   R$ {total_aprovado:.2f}\n"
-            relatorio += f"📉 TOTAL ECONOMIZADO: R$ {total_negado:.2f}\n"
-            relatorio += "========================================"
-
-            st.code(relatorio, language='text')
+            txt_relatorio += "\n======================================\n"
+            txt_relatorio += f"TOTAL SOLICITADO: R$ {val_total:.2f}\n"
+            txt_relatorio += f"TOTAL APROVADO:   R$ {val_aprov:.2f}"
+            
+            st.code(txt_relatorio)
 
         except Exception as e:
-            status.update(label="❌ Erro", state="error")
-            st.error("Erro ao processar. Verifique os arquivos.")
-            st.write(e)
+            st.error(f"Erro ao processar: {e}")
