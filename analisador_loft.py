@@ -494,6 +494,11 @@ Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
+Detalhamento Geral do(s) valor(es) aprovado(s)
+Reparos:
+• Pintura interna: R$ 1.635,00
+(com bônus Refera aplicado, total: R$ 1.798,50)
+Valor total aprovado: R$ 1.798,50
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
