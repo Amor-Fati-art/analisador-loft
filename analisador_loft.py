@@ -45,6 +45,139 @@ Decisão: NEGADO
 Motivo: Pagamento negado... item não fixo/mobília.
 
 (Você pode colar mais exemplos aqui embaixo seguindo esse padrão...)
+Valores Aprovados:
+TROCA DO PAPEL DE PAREDE: 780 REAIS
+REFAZER TEXTURA DA PAREDE: 550 REAIS
+TROCA DA PORTA DE VIDRO: 1750 REAIS
+LIMPEZA DAS PAREDES EXERNAS COM COBERTURA: 550 REAIS
+TROCA DO BALANÇO DE MADEIRA : 750 REAIS
+FAXINA: 350 REAIS
+
+Valores Negados:
+LIMPEZA DA VC DE GORDURA: 480 REAIS
+TROCA DO MOTOR E AQUECEDOR: 9.200 REAIS 
+TROCA DA LÂMPADA DA CHURRASQUEIRA: 35 REAIS
+Motivo: Pagamento negado, conforme consta no nosso termo:  
+"Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco." 
+
+REPARO DO FOGÃO : 450 REAIS 
+Motivo: Tendo em vista que a nossa análise é comparativa entre vistorias de entrada e saída, considerando que no laudo técnico e fotográfico da Entrada não foi possível identificar dano causado pelo locatário.
+Informamos por fim que, a ausência de cobertura pela Loft Fiança não isenta a responsabilidade do locatário com relação aos valores considerados devidos em razão do contrato de locação, podendo a imobiliária cobrar diretamente do inquilino os valores negados.
+
+TROCAR A TORNEIRA DO JARDIM: 35 REAIS 
+Motivo: Pagamento negado, conforme consta no nosso termo:  
+"Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos." 
+
+TROCA DO ESPELHO DO BANHEIRO DA PISCINA: 150 REAIS 
+Motivo: Pagamento negado, conforme consta no nosso termo:  
+"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada." 
+
+Valores Negados:
+Motor piscina R$ 6.866,00 
+Motivo: 
+O pagamento foi negado, conforme previsto em nosso termo, que exclui a cobertura para: "Danos nas redes hidráulicas e elétricas que não consistam em danos aparentes e de acabamentos externos."  
+-----------------------------------------------------
+• Pintura interna: R$ 2.752,50
+• Limpeza geral do imovel: R$ 240,00
+• Ajuste tomada: R$ 180,00
+Valor total aprovado: R$ 3.489,75
+
+Valor(es) negado(s)
+Reparos:
+• Armário: Acabamento superior foi arrancado, instalar novamente: R$ 150,00
+• Armário: Gaveta sem puxador, fazer reposição: R$ 100,00
+• Armário: Acabamento soltando na lateral direita, fazer fixação: R$ 200,00
+Motivo da negativa:
+Valores Contratados: Independentemente da anuência do(s) Locatário(s) e/ou Corresponsável(eis), as despesas que venham a ser indicadas pela Imobiliária para fins de composição do Valor Locatício, a Fiança Loft será prestada para fins de pagamento dos Valores Contratados, que incluem:
+(iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.
+Valor total negado: R$ 1.225,25
+------------------------------------------------
+Valor(es) aprovado(s)
+Reparos:
+• Pintura porta de ferro sala: R$ 80,00
+• Reposição de vidros área de serviço: R$ 300,00
+• Troca de tomadas: R$ 120,00
+• Troca de fechadura completa quarto: R$ 180,00
+• Reposição de vidros quebrados porta: R$ 150,00
+Valor total aprovado: R$ 830,00
+
+Valor(es) negado(s)
+Reparos:
+• Repor telhas: R$ 800,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xii)  danos estruturais nos telhados e/ou porção diversa do imóvel decorrentes de caso fortuito e/ou força maior ou, ainda, de dolo do(s) Locatário(s).
+• Troca de chuveiro: R$ 210,00
+• Troca de ducha higiênica: R$ 120,00
+• Troca de lâmpadas: R$ 80,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xi) danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+• Reposição de prateleiras e porta shampoo: R$ 140,00
+• Repor mangueira: R$ 120,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xiii) danos causados por atos ilícitos, dolosos ou por culpa grave, equiparáveis ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada.
+• Pintura paredes externa: R$ 1.000,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(iv) quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco.
+Valor total negado: R$ 2.470,00
+------------------------------------------------
+Detalhamento Geral do(s) valor(es) aprovado(s)
+Reparos:
+• Pintura interna: R$ 1.230,00
+• Descarte de entulho deixado no imóvel: R$ 380,00
+(com bônus Refera aplicado, total: R$ 1.771,00)
+Valor total aprovado: R$ 1.771,00
+
+Valor(es) negado(s)
+Reparos:
+• EM LÁTEX: R$ 240,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(iv) quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco.
+• Lâmpada: R$ 15,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xiii) danos causados por atos ilícitos, dolosos ou por culpa grave, equiparáveis ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada.
+• Sifão: R$ 15,00
+• Sifão: R$ 15,00
+• Descarga: R$ 140,00
+• Vaso Sanitário: R$ 60,00
+• Lâmpada: R$ 15,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xi) danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+Valor total negado: R$ 589,00
+----------------------------------------------
+Valores Aprovados:
+Pintura interna: R$ 800,00 
+Materiais de pintura: R$ 300,00 
+Limpeza: R$ 200,00 
+Produtos de limpeza: R$ 40,00 
+
+Valores Negados:
+Cozinha - reposição de 01 panela laranja indução 340,00
+Pagamento negado, conforme consta no nosso termo:  
+"Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparáveis ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada." 
+
+Cozinha - banco realizar higienização 70,00
+Quarto - colchão e box higienização 23,00
+Quarto - cortina e blackout lavagem ( incluso retirada e instalação ) 220,00
+Sacada - troca varal portátil 180,00
+Sala e corredor - higienização sofá 220,00
+Sala e corredor - painel rack, remover gaveta para retirada papeis 10,00
+Sala e corredor - tapete higienização 190,00
+Pagamento negado, conforme consta no nosso termo:  
+"Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos." 
+
+Quarto - revisão ar condicionado 220,00
+Pagamento negado, conforme consta no nosso termo:  
+"Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação." 
+
+---------------------------------------------------------
+
 """
 # ==============================================================================
 
