@@ -13,6 +13,17 @@ except (FileNotFoundError, KeyError):
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
+# --- AVISO IMPORTANTE PARA O ANALISTA ---
+st.title("🏢 Auditor Loft - Base Integrada")
+st.warning("""
+⚠️ **ATENÇÃO: FERRAMENTA DE APOIO À DECISÃO**
+Esta ferramenta utiliza Inteligência Artificial para acelerar a leitura de orçamentos extensos.
+**É OBRIGATÓRIA A CONFERÊNCIA VISUAL/MANUAL DOS ITENS.**
+O analista é o responsável final por verificar se a IA aprovou ou negou corretamente cada item antes de finalizar o contrato.
+""")
+
+st.caption("Sistema treinado para seguir rigorosamente as Regras da Empresa (Loft Fiança)")
+
 # ==============================================================================
 # 🔴 ÁREA DE TREINAMENTO (Seu Histórico Mantido)
 # ==============================================================================
@@ -177,56 +188,44 @@ Pagamento negado, conforme consta no nosso termo:  
 # ==============================================================================
 # 🔵 BASE DE CONHECIMENTO (Regras da Empresa - SOBERANA)
 # ==============================================================================
-# AQUI ESTÃO AS REGRAS QUE FORÇAM A NEGATIVA DE SIFÃO, ASSENTO E ÁREA EXTERNA
+# REFORÇADA PARA EVITAR ABREVIAÇÕES NO MOTIVO
 BASE_CONHECIMENTO = """
 VOCÊ É UM ANALISTA DE REPAROS DA LOFT FIANÇA.
 Sua missão é seguir estritamente o TERMO DA EMPRESA.
 Ignore leis externas (inquilinato). A Regra da Empresa é soberana.
 
-🚨 **MANDAMENTOS SUPREMOS (DECISÃO DA EMPRESA):**
-1. **SIFÃO / TORNEIRA / CHUVEIRO / REGISTRO:**
+🚨 **REGRA DE OURO DA SAÍDA DE DADOS (MOTIVO COMPLETO):**
+Ao negar um item, você **JAMAIS** deve abreviar ou resumir o motivo.
+Você deve COPIAR E COLAR o texto exato da "Frase Obrigatória" descrita abaixo.
+Isso é crucial para que o analista apenas copie e cole sua resposta no contrato.
+
+--- REGRAS MANDATÓRIAS (DECISÃO DA EMPRESA) ---
+
+1. **SIFÃO / TORNEIRA / CHUVEIRO / REGISTRO / LÂMPADAS:**
    -> A regra da empresa classifica como **DESGASTE NATURAL** ou MANUTENÇÃO SIMPLES.
    -> DECISÃO: **NEGAR SEMPRE**. Não importa se está quebrado, vazando ou pingando.
-   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
+   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
-2. **ASSENTO SANITÁRIO (TAMPA DO VASO):**
-   -> A regra da empresa classifica como **ITEM MÓVEL/NÃO FIXO** (pode ser retirado).
+2. **ASSENTO SANITÁRIO (TAMPA DO VASO) / MÓVEIS SOLTOS / CORTINAS:**
+   -> A regra da empresa classifica como **ITEM MÓVEL/NÃO FIXO**.
    -> DECISÃO: **NEGAR SEMPRE**.
-   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
+   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
 3. **ÁREA EXTERNA (AÇÃO DO TEMPO):**
-   -> Muros, fachadas, portões expostos, paredes externas da casa (fundo/frente).
+   -> Muros, fachadas, portões expostos, paredes externas da casa (fundo/frente), jardinagem.
    -> DECISÃO: **NEGAR SEMPRE** (Causado por sol/chuva/temperatura).
-   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração."
+   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
---- DEMAIS REGRAS ---
+4. **HIDRÁULICA E ELÉTRICA (INTERNA/OCULTA):**
+   -> Fiação, canos internos, resistência queimada.
+   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
 
-4. ITENS NÃO FIXOS / MOBÍLIA (NEGAR)
-   - Sofás, cortinas, eletros, móveis soltos, itens de decoração.
-
-5. HIDRÁULICA E ELÉTRICA (NEGAR MAIORIA)
-   - Fiação, canos internos, resistências.
-
-6. MAU USO COMPROVADO (APROVAR)
-   - Apenas aprove se for DANO FÍSICO INTENCIONAL em item FIXO COBERTO (Ex: Porta quebrada ao meio por soco, Janela estilhaçada, Parede interna toda riscada de caneta).
+5. **MAU USO COMPROVADO (APROVAR):**
+   -> Apenas aprove se for DANO FÍSICO INTENCIONAL em item FIXO COBERTO.
 
 FORMATO DE SAÍDA JSON:
-[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra exata"}]
+[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra COMPLETO E IDÊNTICO AO TERMO"}]
 """
-
-# --- INTERFACE VISUAL ---
-st.markdown("""
-    <style>
-        .card { padding: 10px; margin-bottom: 5px; border-radius: 5px; border-left: 5px solid; background-color: #262730; }
-        .card-green { border-color: #28a745; }
-        .card-red { border-color: #dc3545; }
-        .card-yellow { border-color: #ffc107; }
-        .price { float: right; font-weight: bold; }
-    </style>
-""", unsafe_allow_html=True)
-
-st.title("🏢 Auditor Loft - Base Integrada")
-st.caption("Sistema treinado para seguir rigorosamente as Regras da Empresa (Loft Fiança)")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -248,7 +247,7 @@ if st.button("🔍 ANALISAR AGORA"):
         st.warning("Por favor, insira um orçamento.")
         st.stop()
 
-    with st.status("🤖 Aplicando regras da empresa...", expanded=True) as status:
+    with st.status("🤖 Aplicando regras da empresa (Conferência Humana Necessária)...", expanded=True) as status:
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
@@ -264,7 +263,7 @@ if st.button("🔍 ANALISAR AGORA"):
 
             # Montagem do Prompt
             prompt = [BASE_CONHECIMENTO]
-            prompt.append("HISTÓRICO DE CASOS DA EMPRESA (SIGA ESTES PADRÕES):")
+            prompt.append("HISTÓRICO DE CASOS DA EMPRESA (SIGA ESTES PADRÕES DE DECISÃO):")
             prompt.append(EXEMPLOS_TREINAMENTO)
             
             if vistoria_entrada:
@@ -304,7 +303,7 @@ if st.button("🔍 ANALISAR AGORA"):
             
             # --- RELATÓRIO COPY/PASTE ---
             st.divider()
-            st.subheader("📋 Relatório Final")
+            st.subheader("📋 Relatório Final (Para Copiar)")
             
             txt_relatorio = "RELATÓRIO TÉCNICO - ANÁLISE DE REPAROS\n"
             txt_relatorio += "======================================\n"
@@ -318,6 +317,7 @@ if st.button("🔍 ANALISAR AGORA"):
                 txt_relatorio += "\n⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
                     txt_relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    # Aqui garante que o motivo apareça completo no relatório
                     txt_relatorio += f"    Motivo: {r['Motivo']}\n"
             
             val_total = df['Valor'].sum()
