@@ -325,7 +325,7 @@ Para o descarte de móveis, lixo comum ou entulho deixado pelo inquilino;
 """
 
 # ==============================================================================
-# 4. JURISPRUDÊNCIA: EXEMPLOS DE TREINAMENTO (PODE ADICIONAR MAIS)
+# 4. JURISPRUDÊNCIA: EXEMPLOS DE TREINAMENTO
 # ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
@@ -352,6 +352,17 @@ Motivo: Imóvel entregue limpo e devolvido sujo com pertences.
 Item: Cortina da Sala Rasgada
 Decisão: NEGADO
 Motivo: Pagamento negado... item não fixo/mobília.
+
+--- EXEMPLO 6 (NOVO) ---
+Item: Chave do portão
+Decisão: APROVADO
+Motivo: Item de segurança essencial/restituição obrigatória.
+
+--- EXEMPLO 7 (NOVO) ---
+Item: Cadeado pado
+Decisão: APROVADO
+Motivo: Item de segurança essencial/restituição obrigatória.
+
 
 Valores Aprovados:
 TROCA DO PAPEL DE PAREDE: 780 REAIS
@@ -472,16 +483,7 @@ Pagamento negado, conforme consta no nosso termo:
 Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
--------------------------------------------
---- EXEMPLO 6 (NOVO) ---
-Item: Chave do portão
-Decisão: APROVADO
-Motivo: Item de segurança.
 
---- EXEMPLO 7 (NOVO) ---
-Item: Cadeado pado
-Decisão: APROVADO
-Motivo: Item de segurança.
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -501,12 +503,18 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
        PORÉM, se o orçamento disser explicitamente 'COM COBERTURA' ou 'ÁREA COBERTA', você deve APROVAR. 
        Se o orçamento NÃO disser se é coberto, marque como VERIFICAR (Yellow/Amarelo) para checagem visual.
     
-    3. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
+    3. **Itens Faltantes / Furtados**: O texto classifica como 'Ato Ilícito' e diz que a 'Loft Fiança não cobre'. Portanto: NEGAR (Red).
+       🔴 **EXCEÇÃO CRÍTICA (SEGURANÇA):** Se o item faltante for **CHAVE, CADEADO ou CONTROLE DE PORTÃO**, você deve **APROVAR** (Green). Motivo: Item de segurança essencial, deve ser restituído.
     
-    4. **Itens Faltantes / Furtados**: O texto classifica como 'Ato Ilícito' e diz que a 'Loft Fiança não cobre'. Portanto: NEGAR (Red) usando o motivo de Ato Ilícito do texto.
-    🔴 **EXCEÇÃO CRÍTICA (SEGURANÇA):** Se o item faltante for **CHAVE, CADEADO ou CONTROLE DE PORTÃO**, você deve **APROVAR** (Green). Motivo: Item de segurança essencial, deve ser restituído.
-    5. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green)
-                  .
+    4. **Torneiras e Hidráulica (Regra de Incerteza)**: 
+       - Se o orçamento disser "Vazamento" ou "Pingando" -> NEGAR (Vermelho - Manutenção).
+       - Se o orçamento disser "Faltando" -> NEGAR (Vermelho - Ato Ilícito).
+       - Se o orçamento disser "Quebrada", "Trocada" -> APROVAR (Verde - Dano do inquilino).
+       - ⚠️ **Se o orçamento disser APENAS "Danificada", "Com defeito" ou "Reparo" sem explicar o motivo -> VERIFICAR (Amarelo). Motivo: Verificar se é vazamento ou quebra física.**
+    
+    5. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
+    
+    6. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green).
 
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
@@ -590,7 +598,7 @@ if st.button("🔍 ANALISAR AGORA"):
                     st.markdown(f'<div class="card card-green"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
 
             if not verificar.empty:
-                st.subheader("⚠️ Atenção: Verificar Visualmente (Pintura Externa)")
+                st.subheader("⚠️ Atenção: Verificar Visualmente")
                 for i, r in verificar.iterrows():
                     st.markdown(f'<div class="card card-yellow"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small style="color: #FFC107">{r["Motivo"]}</small></div>', unsafe_allow_html=True)
 
@@ -612,7 +620,7 @@ if st.button("🔍 ANALISAR AGORA"):
                     txt_relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
 
             if not verificar.empty:
-                txt_relatorio += "\n⚠️ VERIFICAR COBERTURA VISUALMENTE:\n"
+                txt_relatorio += "\n⚠️ VERIFICAR (INCERTEZA NO ITEM):\n"
                 for i, r in verificar.iterrows():
                     txt_relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
                     txt_relatorio += f"    Obs: {r['Motivo']}\n"
