@@ -279,9 +279,9 @@ if st.button("🔍 ANALISAR AGORA"):
             genai.configure(api_key=CHAVE_SECRETA)
             
             # --- ATUALIZAÇÃO PARA GEMINI 3.0 ---
-            # Aqui está o modelo que você pediu (gemini-3-flash-preview)
+            # Aqui está o modelo que você pediu (gemini-2.5-flash)
             # A configuração 'safety_settings' agora usa o formato técnico correto.
-            model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
+            model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
             
             response = model.generate_content(
                 _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
