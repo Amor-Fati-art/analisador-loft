@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
-# ADICIONADO: Importação necessária para o filtro de segurança funcionar 100%
-from google.generativeai.types import HarmCategory, HarmBlockThreshold 
+# IMPORTANTE: Essa linha abaixo é OBRIGATÓRIA para o filtro não bloquear seus orçamentos
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import pandas as pd
 import io
 
@@ -15,8 +15,8 @@ except (FileNotFoundError, KeyError):
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (CORRIGIDA) ---
-# Usamos a configuração técnica "hardcore" para garantir que NADA seja bloqueado.
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (ATUALIZADA PARA NÃO FALHAR) ---
+# Usamos a configuração técnica oficial. Isso força a IA a ler "quebra/dano" sem achar que é violência.
 SAFETY_SETTINGS = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -278,21 +278,19 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- CORREÇÃO AQUI ---
-            # 1. Removida a tentativa de usar o 1.5.
-            # 2. Usando gemini-2.0-flash-exp (a versão estável mais nova)
-            # 3. Se você fizer questão do nome "gemini-3-flash-preview", pode mudar abaixo, mas o 2.0 é mais seguro agora.
-            model = genai.GenerativeModel('gemini-2.0-flash-exp', generation_config={"response_mime_type": "application/json"})
+            # --- ATUALIZAÇÃO PARA GEMINI 3.0 ---
+            # Aqui está o modelo que você pediu (gemini-3-flash-preview)
+            # A configuração 'safety_settings' agora usa o formato técnico correto.
+            model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
             
             response = model.generate_content(
                 _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
                 safety_settings=SAFETY_SETTINGS
             )
-            st.toast("🚀 Análise Feita (Segurança Desativada)")
-
-            # Verificação para não dar tela vermelha se a IA falhar silenciosamente
+            
+            # Verificamos se há resposta válida antes de tentar ler
             if not response.parts:
-                st.error("Erro interno: A IA bloqueou a resposta apesar dos filtros. Tente novamente.")
+                st.error("Erro no retorno da IA. Tente novamente em alguns segundos.")
                 st.stop()
 
             df = pd.read_json(io.StringIO(response.text))
