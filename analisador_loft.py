@@ -4,22 +4,17 @@ import pandas as pd
 import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
-# AJUSTE FEITO: Agora funciona no computador (local) e no site (deploy)
 try:
     # Tenta buscar a chave segura configurada no site do Streamlit
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
     # Se der erro (porque está no seu PC sem o arquivo), usa a chave direta:
-    # (Copiada da sua imagem para a apresentação de hoje)
     CHAVE_SECRETA = "AIzaSyDHG1S0UljyHyuA2agXdw0v9ilYBCltIaY"
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
 # ==============================================================================
-# 🔴 ÁREA DE TREINAMENTO (Seu Histórico do OneNote)
-# ==============================================================================
-# Cole abaixo os exemplos de casos que você já resolveu.
-# A IA vai usar isso para copiar o seu estilo de decisão.
+# 🔴 ÁREA DE TREINAMENTO (Seu Histórico Mantido)
 # ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
@@ -177,56 +172,46 @@ Pagamento negado, conforme consta no nosso termo:  
 Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação." 
-
----------------------------------------------------------
-
 """
-# ==============================================================================
-
 
 # ==============================================================================
-# 🔵 BASE DE CONHECIMENTO (Regras Oficiais Loft Fiança)
+# 🔵 BASE DE CONHECIMENTO (Regras da Empresa - SOBERANA)
 # ==============================================================================
+# AQUI ESTÃO AS REGRAS QUE FORÇAM A NEGATIVA DE SIFÃO, ASSENTO E ÁREA EXTERNA
 BASE_CONHECIMENTO = """
-VOCÊ É UM AUDITOR TÉCNICO DA LOFT FIANÇA.
-Sua missão é analisar orçamentos de reparo comparando Vistoria de Entrada vs. Saída.
+VOCÊ É UM ANALISTA DE REPAROS DA LOFT FIANÇA.
+Sua missão é seguir estritamente o TERMO DA EMPRESA.
+Ignore leis externas (inquilinato). A Regra da Empresa é soberana.
 
-REGRA DE OURO:
-1. Se o dano já existia na entrada (mesmo estado) -> NEGAR.
-2. Se o dano é desgaste natural (tempo) -> NEGAR.
-3. Se o dano é mau uso comprovado (mudança de estado) -> APROVAR.
+🚨 **MANDAMENTOS SUPREMOS (DECISÃO DA EMPRESA):**
+1. **SIFÃO / TORNEIRA / CHUVEIRO / REGISTRO:**
+   -> A regra da empresa classifica como **DESGASTE NATURAL** ou MANUTENÇÃO SIMPLES.
+   -> DECISÃO: **NEGAR SEMPRE**. Não importa se está quebrado, vazando ou pingando.
+   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
 
-REGRAS ESPECÍFICAS (COPIADAS DO TERMO):
+2. **ASSENTO SANITÁRIO (TAMPA DO VASO):**
+   -> A regra da empresa classifica como **ITEM MÓVEL/NÃO FIXO** (pode ser retirado).
+   -> DECISÃO: **NEGAR SEMPRE**.
+   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
-1. DESGASTES NATURAIS (NEGAR)
-   - Tinta desbotada, marcas leves de móveis, lâmpadas queimadas, encardido de rejunte.
-   - Frase Obrigatória: "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel."
+3. **ÁREA EXTERNA (AÇÃO DO TEMPO):**
+   -> Muros, fachadas, portões expostos, paredes externas da casa (fundo/frente).
+   -> DECISÃO: **NEGAR SEMPRE** (Causado por sol/chuva/temperatura).
+   -> Motivo Obrigatório: "Pagamento negado, conforme consta no nosso termo: danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração."
 
-2. AÇÃO DO TEMPO / ÁREA EXTERNA (NEGAR)
-   - Pintura externa, muros, fachadas, portões expostos, jardinagem (mato crescido).
-   - Frase Obrigatória: "Pagamento negado... danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração."
+--- DEMAIS REGRAS ---
 
-3. ITENS NÃO FIXOS / MOBÍLIA (NEGAR)
-   - Sofás, cortinas soltas, eletros, móveis não planejados.
-   - Frase Obrigatória: "Pagamento negado... item não fixo/mobília."
+4. ITENS NÃO FIXOS / MOBÍLIA (NEGAR)
+   - Sofás, cortinas, eletros, móveis soltos, itens de decoração.
 
-4. HIDRÁULICA E ELÉTRICA
-   - Oculto/Interno (Fiação, cano na parede) -> NEGAR (Estrutural).
-   - Visível/Uso (Tomada quebrada, sifão quebrado, louça sanitária quebrada) -> APROVAR (Mau uso).
-   - Frase Obrigatória se negar: "Pagamento negado... Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes."
+5. HIDRÁULICA E ELÉTRICA (NEGAR MAIORIA)
+   - Fiação, canos internos, resistências.
 
-5. CAÇAMBAS E ENTULHOS
-   - Só aprovar se houver obras/reparos aprovados que gerem entulho.
-   - Se for apenas lixo do inquilino -> Aprovar como "Retirada de itens".
-
-6. ATO ILÍCITO (Item Furtado)
-   - Confirmar se o item realmente sumiu comparando vistorias.
-   - Frase: "Danos causados por atos ilícitos..."
+6. MAU USO COMPROVADO (APROVAR)
+   - Apenas aprove se for DANO FÍSICO INTENCIONAL em item FIXO COBERTO (Ex: Porta quebrada ao meio por soco, Janela estilhaçada, Parede interna toda riscada de caneta).
 
 FORMATO DE SAÍDA JSON:
-[
-  {"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra"}
-]
+[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra exata"}]
 """
 
 # --- INTERFACE VISUAL ---
@@ -241,7 +226,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🏢 Auditor Loft - Base Integrada")
-st.caption("Sistema carregado com: Base de Conhecimento Oficial + Seus Exemplos de Treinamento")
+st.caption("Sistema treinado para seguir rigorosamente as Regras da Empresa (Loft Fiança)")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -263,35 +248,42 @@ if st.button("🔍 ANALISAR AGORA"):
         st.warning("Por favor, insira um orçamento.")
         st.stop()
 
-    with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
-        genai.configure(api_key=CHAVE_SECRETA)
-        
-        # ATUALIZADO PARA O MODELO GEMINI 3 FLASH (PREVIEW)
-        model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
-        
-        # Montagem do Prompt
-        prompt = [BASE_CONHECIMENTO]
-        
-        prompt.append("HISTÓRICO DE APRENDIZADO (USE ISSO COMO EXEMPLO DE DECISÃO):")
-        prompt.append(EXEMPLOS_TREINAMENTO)
-        
-        if vistoria_entrada:
-            prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
-            prompt.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
-        
-        if vistoria_saida:
-            prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
-            prompt.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
-            
-        prompt.append("ORÇAMENTO A ANALISAR:")
-        if orcamento_arq:
-            prompt.append({"mime_type": orcamento_arq.type, "data": orcamento_arq.getvalue()})
-        else:
-            prompt.append(orcamento_txt)
-            
+    with st.status("🤖 Aplicando regras da empresa...", expanded=True) as status:
         try:
+            genai.configure(api_key=CHAVE_SECRETA)
+            
+            # --- LÓGICA HÍBRIDA (GEMINI 3 com BACKUP) ---
+            try:
+                # Tenta o modelo mais inteligente primeiro
+                model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
+                st.toast("🚀 Usando Gemini 3 Flash (Preview)")
+            except:
+                # Se falhar, usa o modelo estável
+                model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+                st.toast("⚠️ Usando Backup (Gemini 1.5 Flash)")
+
+            # Montagem do Prompt
+            prompt = [BASE_CONHECIMENTO]
+            prompt.append("HISTÓRICO DE CASOS DA EMPRESA (SIGA ESTES PADRÕES):")
+            prompt.append(EXEMPLOS_TREINAMENTO)
+            
+            if vistoria_entrada:
+                prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
+                prompt.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
+            
+            if vistoria_saida:
+                prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
+                prompt.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
+                
+            prompt.append("ORÇAMENTO A ANALISAR:")
+            if orcamento_arq:
+                prompt.append({"mime_type": orcamento_arq.type, "data": orcamento_arq.getvalue()})
+            else:
+                prompt.append(orcamento_txt)
+            
             response = model.generate_content(prompt)
             df = pd.read_json(io.StringIO(response.text))
+            
             status.update(label="✅ Análise Concluída", state="complete", expanded=False)
             
             # --- RESULTADOS ---
@@ -299,9 +291,7 @@ if st.button("🔍 ANALISAR AGORA"):
             
             aprovados = df[df['Status'].str.contains("Aprovado", case=False)]
             negados = df[df['Status'].str.contains("Negado", case=False)]
-            atencao = df[df['Status'].str.contains("Atenção", case=False)]
             
-            # Exibição Visual
             if not aprovados.empty:
                 st.subheader("✅ Aprovados")
                 for i, r in aprovados.iterrows():
@@ -312,11 +302,6 @@ if st.button("🔍 ANALISAR AGORA"):
                 for i, r in negados.iterrows():
                     st.markdown(f'<div class="card card-red"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
             
-            if not atencao.empty:
-                st.subheader("⚠️ Atenção")
-                for i, r in atencao.iterrows():
-                    st.markdown(f'<div class="card card-yellow"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
-
             # --- RELATÓRIO COPY/PASTE ---
             st.divider()
             st.subheader("📋 Relatório Final")
@@ -336,7 +321,7 @@ if st.button("🔍 ANALISAR AGORA"):
                     txt_relatorio += f"    Motivo: {r['Motivo']}\n"
             
             val_total = df['Valor'].sum()
-            val_aprov = aprovados['Valor'].sum()
+            val_aprov = aprovados['Valor'].sum() if not aprovados.empty else 0
             
             txt_relatorio += "\n======================================\n"
             txt_relatorio += f"TOTAL SOLICITADO: R$ {val_total:.2f}\n"
@@ -345,4 +330,4 @@ if st.button("🔍 ANALISAR AGORA"):
             st.code(txt_relatorio)
 
         except Exception as e:
-            st.error(f"Erro ao processar: {e}")
+            st.error(f"Erro no processamento: {e}")
