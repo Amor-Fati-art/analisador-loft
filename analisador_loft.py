@@ -483,7 +483,6 @@ Item: Cadeado pado
 Decisão: APROVADO
 Motivo: Item de segurança.
 """
-"""
 
 # --- 5. FUNÇÃO AUXILIAR ---
 def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
@@ -505,8 +504,9 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
     3. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
     
     4. **Itens Faltantes / Furtados**: O texto classifica como 'Ato Ilícito' e diz que a 'Loft Fiança não cobre'. Portanto: NEGAR (Red) usando o motivo de Ato Ilícito do texto.
-    
-    5. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green).
+    🔴 **EXCEÇÃO CRÍTICA (SEGURANÇA):** Se o item faltante for **CHAVE, CADEADO ou CONTROLE DE PORTÃO**, você deve **APROVAR** (Green). Motivo: Item de segurança essencial, deve ser restituído.
+    5. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green)
+                  .
 
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
