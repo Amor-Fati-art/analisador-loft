@@ -5,20 +5,28 @@ import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
 try:
-    # Tenta buscar a chave nos "Cofres" do site (Streamlit Cloud)
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    # SE FALHAR (NO SEU PC), USA ESTA NOVA CHAVE DIRETA:
+    # SUA NOVA CHAVE (Já atualizada conforme seu envio anterior)
     CHAVE_SECRETA = "AIzaSyC9XBUq93SZ8Odkr4LtfoKsJadZ9bmT2DY"
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- AVISO CRÍTICO PARA O ANALISTA (POP-UP) ---
+# --- CONFIGURAÇÃO ANTI-BLOQUEIO (NOVO) ---
+# Isso impede que a IA bloqueie a resposta por achar que "Dano" ou "Quebra" é conteúdo perigoso.
+SAFETY_SETTINGS = [
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+]
+
+# --- AVISO CRÍTICO ---
 st.title("🏢 Auditor Loft - Base Integrada")
 st.warning("""
 ⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
 A IA é uma ferramenta de apoio. **VOCÊ É O RESPONSÁVEL FINAL.**
-* **Verifique o Motivo:** Se for Lâmpada/Ducha/Torneira, o motivo deve ser "Rede Elétrica/Hidráulica" e não apenas "Desgaste".
+* **Verifique o Motivo:** Se for Lâmpada/Ducha/Torneira, o motivo deve ser "Rede Elétrica/Hidráulica".
 * **Itens Faltantes:** Se sumiu, é "Ato Ilícito".
 * **Conferência Visual:** Sempre compare com as fotos antes de finalizar.
 """)
@@ -26,7 +34,7 @@ A IA é uma ferramenta de apoio. **VOCÊ É O RESPONSÁVEL FINAL.**
 st.caption("Sistema treinado para seguir rigorosamente as Regras da Empresa (Loft Fiança)")
 
 # ==============================================================================
-# 🔴 ÁREA DE TREINAMENTO (Seus Exemplos Originais Mantidos)
+# 🔴 ÁREA DE TREINAMENTO
 # ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
@@ -187,7 +195,7 @@ Pagamento negado, conforme consta no nosso termo:  
 """
 
 # ==============================================================================
-# 🔵 BASE DE CONHECIMENTO (Atualizada com a Tabela DE/PARA)
+# 🔵 BASE DE CONHECIMENTO (DE/PARA OBRIGATÓRIO)
 # ==============================================================================
 BASE_CONHECIMENTO = """
 VOCÊ É UM ANALISTA DE REPAROS DA LOFT FIANÇA.
@@ -195,8 +203,7 @@ Sua missão é seguir estritamente o TERMO DA EMPRESA.
 Ignore leis externas. A Regra da Empresa é soberana.
 
 🚨 **TABELA DE MOTIVOS OBRIGATÓRIOS (DE/PARA)** 🚨
-Você deve classificar o motivo da negativa de acordo com o TIPO do item abaixo.
-A Monitoria exige o motivo técnico correto, não use "Desgaste Natural" para tudo.
+A Monitoria exige o motivo técnico correto. NÃO invente motivos.
 
 TYPE A: LÂMPADAS, CHUVEIROS, DUCHAS, TORNEIRAS, REGISTROS
 -> Se estiver queimado, vazando, pingando ou com defeito funcional.
@@ -218,7 +225,6 @@ TYPE D: ITENS MÓVEIS (ASSENTO VASO, CORTINA, MÓVEL SOLTO)
 -> **MOTIVO OBRIGATÓRIO (MOBÍLIA):** "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
 TYPE E: DESGASTE REAL (PINTURA INTERNA VELHA, RISCOS LEVES PISO)
--> Apenas para itens INTERNOS de acabamento.
 -> **DECISÃO:** NEGAR.
 -> **MOTIVO OBRIGATÓRIO (USO NORMAL):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
@@ -250,36 +256,23 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- LÓGICA HÍBRIDA (GEMINI 3 com BACKUP) ---
+            # --- LÓGICA HÍBRIDA + SAFETY SETTINGS (CORREÇÃO DO ERRO) ---
+            # Adicionamos 'safety_settings' para evitar bloqueios falsos positivos
             try:
-                # Tenta o modelo mais inteligente primeiro
                 model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
+                response = model.generate_content(
+                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
+                    safety_settings=SAFETY_SETTINGS
+                )
                 st.toast("🚀 Usando Gemini 3 Flash (Preview)")
             except:
-                # Se falhar, usa o modelo estável
+                st.toast("⚠️ Trocando para Gemini 1.5 Flash (Backup)")
                 model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
-                st.toast("⚠️ Usando Backup (Gemini 1.5 Flash)")
+                response = model.generate_content(
+                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
+                    safety_settings=SAFETY_SETTINGS
+                )
 
-            # Montagem do Prompt
-            prompt = [BASE_CONHECIMENTO]
-            prompt.append("HISTÓRICO DE CASOS DA EMPRESA (SIGA ESTES PADRÕES DE DECISÃO):")
-            prompt.append(EXEMPLOS_TREINAMENTO)
-            
-            if vistoria_entrada:
-                prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
-                prompt.append({"mime_type": vistoria_entrada.type, "data": vistoria_entrada.getvalue()})
-            
-            if vistoria_saida:
-                prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
-                prompt.append({"mime_type": vistoria_saida.type, "data": vistoria_saida.getvalue()})
-                
-            prompt.append("ORÇAMENTO A ANALISAR:")
-            if orcamento_arq:
-                prompt.append({"mime_type": orcamento_arq.type, "data": orcamento_arq.getvalue()})
-            else:
-                prompt.append(orcamento_txt)
-            
-            response = model.generate_content(prompt)
             df = pd.read_json(io.StringIO(response.text))
             
             status.update(label="✅ Análise Concluída", state="complete", expanded=False)
@@ -300,7 +293,7 @@ if st.button("🔍 ANALISAR AGORA"):
                 for i, r in negados.iterrows():
                     st.markdown(f'<div class="card card-red"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
             
-            # --- RELATÓRIO COPY/PASTE ---
+            # --- RELATÓRIO ---
             st.divider()
             st.subheader("📋 Relatório Final (Para Copiar)")
             
@@ -316,7 +309,6 @@ if st.button("🔍 ANALISAR AGORA"):
                 txt_relatorio += "\n⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
                     txt_relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
-                    # Aqui garante que o motivo apareça completo no relatório
                     txt_relatorio += f"    Motivo: {r['Motivo']}\n"
             
             val_total = df['Valor'].sum()
@@ -330,3 +322,21 @@ if st.button("🔍 ANALISAR AGORA"):
 
         except Exception as e:
             st.error(f"Erro no processamento: {e}")
+
+# Função auxiliar para não repetir código
+def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
+    prompt = [base]
+    prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
+    prompt.append(exemplos)
+    if v_ent:
+        prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
+        prompt.append({"mime_type": v_ent.type, "data": v_ent.getvalue()})
+    if v_sai:
+        prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
+        prompt.append({"mime_type": v_sai.type, "data": v_sai.getvalue()})
+    prompt.append("ORÇAMENTO A ANALISAR:")
+    if o_arq:
+        prompt.append({"mime_type": o_arq.type, "data": o_arq.getvalue()})
+    else:
+        prompt.append(o_txt)
+    return prompt
