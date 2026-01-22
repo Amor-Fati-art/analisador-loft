@@ -3,21 +3,18 @@ import google.generativeai as genai
 import pandas as pd
 import io
 
-# ==============================================================================
-# 🚨 OPERAÇÃO DE EMERGÊNCIA (APRESENTAÇÃO 14:00)
-# ==============================================================================
-
-# 1. CONFIGURAÇÃO DE SEGURANÇA COM BACKUP
+# --- 1. CONFIGURAÇÃO DE SEGURANÇA (AUTOMÁTICA) ---
 try:
-    # Tenta pegar do arquivo secrets.toml
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    # SE FALHAR, USA ESTA CHAVE DIRETA (Segurança de Emergência para a Demo)
-    CHAVE_SECRETA = "AIzaSyC9XBUq93SZ8Odkr4LtfoKsJadZ9bmT2DY"
+    st.error("❌ ERRO DE CONFIGURAÇÃO: O arquivo de segredos não foi encontrado.")
+    st.info("👉 NO SEU PC: Verifique se o arquivo se chama 'secrets.toml' (sem .txt no final).")
+    st.stop()
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# 2. CONFIGURAÇÃO ANTI-BLOQUEIO (SAFETY SETTINGS)
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (ATIVADA) ---
+# Impede que o Google bloqueie palavras como "quebra", "dano", "furto".
 SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -25,7 +22,7 @@ SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-# 3. FUNÇÃO AUXILIAR (DEFINIDA NO TOPO PARA NÃO DAR ERRO)
+# --- 3. FUNÇÃO AUXILIAR (PRONTA PARA USO) ---
 def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
     prompt = [base]
     prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
@@ -43,7 +40,7 @@ def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
         prompt.append(o_txt)
     return prompt
 
-# --- INTERFACE ---
+# --- 4. INTERFACE ---
 st.title("🏢 Auditor Loft - Base Integrada")
 st.warning("""
 ⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
@@ -279,15 +276,22 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- MODELO ESTÁVEL PARA A APRESENTAÇÃO ---
-            # Troquei para o 1.5 Flash como PRINCIPAL para evitar erros de preview
-            model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
-            
-            response = model.generate_content(
-                _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
-                safety_settings=SAFETY_SETTINGS
-            )
-            st.toast("🚀 Análise Concluída com Sucesso")
+            # --- LÓGICA HÍBRIDA ---
+            # CORREÇÃO AQUI: safety_settings agora é enviado para a IA
+            try:
+                model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
+                response = model.generate_content(
+                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
+                    safety_settings=SAFETY_SETTINGS
+                )
+                st.toast("🚀 Usando Gemini 3 Flash (Preview)")
+            except:
+                st.toast("⚠️ Trocando para Gemini 1.5 Flash (Backup)")
+                model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+                response = model.generate_content(
+                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
+                    safety_settings=SAFETY_SETTINGS
+                )
 
             df = pd.read_json(io.StringIO(response.text))
             
