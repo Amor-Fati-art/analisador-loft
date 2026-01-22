@@ -5,27 +5,26 @@ import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
 try:
-    # Tenta buscar a chave segura configurada no site do Streamlit
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    # Se der erro (porque está no seu PC sem o arquivo), usa a chave direta:
     CHAVE_SECRETA = "AIzaSyDHG1S0UljyHyuA2agXdw0v9ilYBCltIaY"
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- AVISO IMPORTANTE PARA O ANALISTA ---
+# --- AVISO CRÍTICO PARA O ANALISTA (O POP-UP SOLICITADO) ---
 st.title("🏢 Auditor Loft - Base Integrada")
 st.warning("""
-⚠️ **ATENÇÃO: FERRAMENTA DE APOIO À DECISÃO**
-Esta ferramenta utiliza Inteligência Artificial para acelerar a leitura de orçamentos extensos.
-**É OBRIGATÓRIA A CONFERÊNCIA VISUAL/MANUAL DOS ITENS.**
-O analista é o responsável final por verificar se a IA aprovou ou negou corretamente cada item antes de finalizar o contrato.
+⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
+A IA é uma ferramenta de apoio. **VOCÊ É O RESPONSÁVEL FINAL.**
+* **Verifique o Motivo:** Se for Lâmpada/Ducha, o motivo deve ser "Rede Elétrica/Hidráulica" e não apenas "Desgaste".
+* **Encontrou um erro?** Comunique a supervisão imediatamente para ajustarmos o treinamento.
+* **Conferência Visual:** Sempre compare com as fotos antes de finalizar.
 """)
 
 st.caption("Sistema treinado para seguir rigorosamente as Regras da Empresa (Loft Fiança)")
 
 # ==============================================================================
-# 🔴 ÁREA DE TREINAMENTO (Seu Histórico Mantido)
+# 🔴 ÁREA DE TREINAMENTO (Seus Exemplos Originais Mantidos)
 # ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
@@ -186,45 +185,43 @@ Pagamento negado, conforme consta no nosso termo:  
 """
 
 # ==============================================================================
-# 🔵 BASE DE CONHECIMENTO (Regras da Empresa - SOBERANA)
+# 🔵 BASE DE CONHECIMENTO (Atualizada com a Tabela DE/PARA)
 # ==============================================================================
-# REFORÇADA PARA EVITAR ABREVIAÇÕES NO MOTIVO
 BASE_CONHECIMENTO = """
 VOCÊ É UM ANALISTA DE REPAROS DA LOFT FIANÇA.
 Sua missão é seguir estritamente o TERMO DA EMPRESA.
-Ignore leis externas (inquilinato). A Regra da Empresa é soberana.
+Ignore leis externas. A Regra da Empresa é soberana.
 
-🚨 **REGRA DE OURO DA SAÍDA DE DADOS (MOTIVO COMPLETO):**
-Ao negar um item, você **JAMAIS** deve abreviar ou resumir o motivo.
-Você deve COPIAR E COLAR o texto exato da "Frase Obrigatória" descrita abaixo.
-Isso é crucial para que o analista apenas copie e cole sua resposta no contrato.
+🚨 **TABELA DE MOTIVOS OBRIGATÓRIOS (DE/PARA)** 🚨
+Você deve classificar o motivo da negativa de acordo com o TIPO do item abaixo.
+A Monitoria exige o motivo técnico correto, não use "Desgaste Natural" para tudo.
 
---- REGRAS MANDATÓRIAS (DECISÃO DA EMPRESA) ---
+TYPE A: LÂMPADAS, CHUVEIROS, DUCHAS, TORNEIRAS, REGISTROS
+-> Se estiver queimado, vazando, pingando ou com defeito funcional.
+-> **DECISÃO:** NEGAR.
+-> **MOTIVO OBRIGATÓRIO (ELÉTRICA/HIDRÁULICA):** "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
 
-1. **SIFÃO / TORNEIRA / CHUVEIRO / REGISTRO / LÂMPADAS:**
-   -> A regra da empresa classifica como **DESGASTE NATURAL** ou MANUTENÇÃO SIMPLES.
-   -> DECISÃO: **NEGAR SEMPRE**. Não importa se está quebrado, vazando ou pingando.
-   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
+TYPE B: ITEM FALTANTE (SUMIU DO IMÓVEL)
+-> Se na entrada tinha e na saída não tem (foi retirado/furtado).
+-> **DECISÃO:** NEGAR.
+-> **MOTIVO OBRIGATÓRIO (ATO ILÍCITO):** "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada."
 
-2. **ASSENTO SANITÁRIO (TAMPA DO VASO) / MÓVEIS SOLTOS / CORTINAS:**
-   -> A regra da empresa classifica como **ITEM MÓVEL/NÃO FIXO**.
-   -> DECISÃO: **NEGAR SEMPRE**.
-   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
+TYPE C: ÁREA EXTERNA (MUROS, FACHADAS, PORTÕES, JARDIM)
+-> Danos por sol, chuva, ferrugem externa.
+-> **DECISÃO:** NEGAR.
+-> **MOTIVO OBRIGATÓRIO (AÇÃO DO TEMPO):** "Pagamento negado, conforme consta no nosso termo: danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
 
-3. **ÁREA EXTERNA (AÇÃO DO TEMPO):**
-   -> Muros, fachadas, portões expostos, paredes externas da casa (fundo/frente), jardinagem.
-   -> DECISÃO: **NEGAR SEMPRE** (Causado por sol/chuva/temperatura).
-   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco."
+TYPE D: ITENS MÓVEIS (ASSENTO VASO, CORTINA, MÓVEL SOLTO)
+-> **DECISÃO:** NEGAR.
+-> **MOTIVO OBRIGATÓRIO (MOBÍLIA):** "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
-4. **HIDRÁULICA E ELÉTRICA (INTERNA/OCULTA):**
-   -> Fiação, canos internos, resistência queimada.
-   -> **Frase Obrigatória (COPIE INTEGRALMENTE):** "Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos."
-
-5. **MAU USO COMPROVADO (APROVAR):**
-   -> Apenas aprove se for DANO FÍSICO INTENCIONAL em item FIXO COBERTO.
+TYPE E: DESGASTE REAL (PINTURA INTERNA VELHA, RISCOS LEVES PISO)
+-> Apenas para itens INTERNOS de acabamento.
+-> **DECISÃO:** NEGAR.
+-> **MOTIVO OBRIGATÓRIO (USO NORMAL):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
 FORMATO DE SAÍDA JSON:
-[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra COMPLETO E IDÊNTICO AO TERMO"}]
+[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra exata"}]
 """
 
 col1, col2 = st.columns(2)
