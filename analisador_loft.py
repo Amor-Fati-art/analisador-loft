@@ -7,13 +7,13 @@ import io
 try:
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    # SUA NOVA CHAVE (Já atualizada conforme seu envio anterior)
+    # SUA NOVA CHAVE
     CHAVE_SECRETA = "AIzaSyC9XBUq93SZ8Odkr4LtfoKsJadZ9bmT2DY"
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- CONFIGURAÇÃO ANTI-BLOQUEIO (NOVO) ---
-# Isso impede que a IA bloqueie a resposta por achar que "Dano" ou "Quebra" é conteúdo perigoso.
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (SAFETY SETTINGS) ---
+# Isso impede que o Google bloqueie palavras como "quebra", "dano", "furto".
 SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -21,7 +21,25 @@ SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-# --- AVISO CRÍTICO ---
+# --- 3. FUNÇÃO AUXILIAR (MOVIDA PARA O TOPO PARA EVITAR ERROS) ---
+def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
+    prompt = [base]
+    prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
+    prompt.append(exemplos)
+    if v_ent:
+        prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
+        prompt.append({"mime_type": v_ent.type, "data": v_ent.getvalue()})
+    if v_sai:
+        prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
+        prompt.append({"mime_type": v_sai.type, "data": v_sai.getvalue()})
+    prompt.append("ORÇAMENTO A ANALISAR:")
+    if o_arq:
+        prompt.append({"mime_type": o_arq.type, "data": o_arq.getvalue()})
+    else:
+        prompt.append(o_txt)
+    return prompt
+
+# --- 4. INTERFACE ---
 st.title("🏢 Auditor Loft - Base Integrada")
 st.warning("""
 ⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
@@ -322,21 +340,3 @@ if st.button("🔍 ANALISAR AGORA"):
 
         except Exception as e:
             st.error(f"Erro no processamento: {e}")
-
-# Função auxiliar para não repetir código
-def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
-    prompt = [base]
-    prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
-    prompt.append(exemplos)
-    if v_ent:
-        prompt.append("CONTEXTO: VISTORIA DE ENTRADA")
-        prompt.append({"mime_type": v_ent.type, "data": v_ent.getvalue()})
-    if v_sai:
-        prompt.append("CONTEXTO: VISTORIA DE SAÍDA")
-        prompt.append({"mime_type": v_sai.type, "data": v_sai.getvalue()})
-    prompt.append("ORÇAMENTO A ANALISAR:")
-    if o_arq:
-        prompt.append({"mime_type": o_arq.type, "data": o_arq.getvalue()})
-    else:
-        prompt.append(o_txt)
-    return prompt
