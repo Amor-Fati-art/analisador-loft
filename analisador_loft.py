@@ -3,20 +3,18 @@ import google.generativeai as genai
 import pandas as pd
 import io
 
-# --- 1. CONFIGURAÇÃO DE SEGURANÇA (LIMPA) ---
-# O código agora SÓ busca nos secrets. Se não achar, ele avisa para configurar.
-# Não existe mais chave escrita aqui para vazar.
+# --- 1. CONFIGURAÇÃO DE SEGURANÇA (AUTOMÁTICA) ---
 try:
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    st.error("❌ ERRO: Chave não encontrada!")
-    st.info("👉 NO SEU PC: Crie a pasta '.streamlit' e o arquivo 'secrets.toml' com a chave.")
-    st.info("👉 NO SITE: Vá em Settings > Secrets e cole a chave lá.")
+    st.error("❌ ERRO DE CONFIGURAÇÃO: O arquivo de segredos não foi encontrado.")
+    st.info("👉 NO SEU PC: Verifique se o arquivo se chama 'secrets.toml' (sem .txt no final).")
     st.stop()
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO ---
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (ATIVADA) ---
+# Impede que o Google bloqueie palavras como "quebra", "dano", "furto".
 SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -24,7 +22,7 @@ SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-# --- 3. FUNÇÃO AUXILIAR ---
+# --- 3. FUNÇÃO AUXILIAR (PRONTA PARA USO) ---
 def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
     prompt = [base]
     prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
@@ -278,7 +276,8 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- LÓGICA HÍBRIDA + SAFETY SETTINGS (CORREÇÃO DO ERRO) ---
+            # --- LÓGICA HÍBRIDA ---
+            # CORREÇÃO AQUI: safety_settings agora é enviado para a IA
             try:
                 model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
                 response = model.generate_content(
