@@ -15,9 +15,6 @@ st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", 
 # ==============================================================================
 # 🔴 ÁREA DE TREINAMENTO (Seu Histórico do OneNote)
 # ==============================================================================
-# Cole abaixo os exemplos de casos que você já resolveu.
-# A IA vai usar isso para copiar o seu estilo de decisão.
-# ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
 Item: Pintura de Fachada Externa
@@ -44,7 +41,6 @@ Item: Cortina da Sala Rasgada
 Decisão: NEGADO
 Motivo: Pagamento negado... item não fixo/mobília.
 
-(Você pode colar mais exemplos aqui embaixo seguindo esse padrão...)
 Valores Aprovados:
 TROCA DO PAPEL DE PAREDE: 780 REAIS
 REFAZER TEXTURA DA PAREDE: 550 REAIS
@@ -175,12 +171,7 @@ Pagamento negado, conforme consta no nosso termo:
 Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação." 
-
----------------------------------------------------------
-
 """
-# ==============================================================================
-
 
 # ==============================================================================
 # 🔵 BASE DE CONHECIMENTO (Regras Oficiais Loft Fiança)
@@ -263,7 +254,10 @@ if st.button("🔍 ANALISAR AGORA"):
 
     with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
         genai.configure(api_key=CHAVE_SECRETA)
-        model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+        
+        # --- CORREÇÃO AQUI: Mudamos para gemini-1.5-pro ---
+        model = genai.GenerativeModel('gemini-1.5-pro', generation_config={"response_mime_type": "application/json"})
+        # --------------------------------------------------
         
         # Montagem do Prompt
         prompt = [BASE_CONHECIMENTO]
