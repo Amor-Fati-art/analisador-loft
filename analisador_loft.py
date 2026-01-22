@@ -3,17 +3,20 @@ import google.generativeai as genai
 import pandas as pd
 import io
 
-# --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
+# --- 1. CONFIGURAÇÃO DE SEGURANÇA (LIMPA) ---
+# O código agora SÓ busca nos secrets. Se não achar, ele avisa para configurar.
+# Não existe mais chave escrita aqui para vazar.
 try:
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    # SUA NOVA CHAVE
-    CHAVE_SECRETA = "AIzaSyC9XBUq93SZ8Odkr4LtfoKsJadZ9bmT2DY"
+    st.error("❌ ERRO: Chave não encontrada!")
+    st.info("👉 NO SEU PC: Crie a pasta '.streamlit' e o arquivo 'secrets.toml' com a chave.")
+    st.info("👉 NO SITE: Vá em Settings > Secrets e cole a chave lá.")
+    st.stop()
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (SAFETY SETTINGS) ---
-# Isso impede que o Google bloqueie palavras como "quebra", "dano", "furto".
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO ---
 SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -21,7 +24,7 @@ SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-# --- 3. FUNÇÃO AUXILIAR (MOVIDA PARA O TOPO PARA EVITAR ERROS) ---
+# --- 3. FUNÇÃO AUXILIAR ---
 def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
     prompt = [base]
     prompt.append("HISTÓRICO DE CASOS DA EMPRESA:")
@@ -243,6 +246,7 @@ TYPE D: ITENS MÓVEIS (ASSENTO VASO, CORTINA, MÓVEL SOLTO)
 -> **MOTIVO OBRIGATÓRIO (MOBÍLIA):** "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
 TYPE E: DESGASTE REAL (PINTURA INTERNA VELHA, RISCOS LEVES PISO)
+-> Apenas para itens INTERNOS de acabamento.
 -> **DECISÃO:** NEGAR.
 -> **MOTIVO OBRIGATÓRIO (USO NORMAL):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
@@ -275,7 +279,6 @@ if st.button("🔍 ANALISAR AGORA"):
             genai.configure(api_key=CHAVE_SECRETA)
             
             # --- LÓGICA HÍBRIDA + SAFETY SETTINGS (CORREÇÃO DO ERRO) ---
-            # Adicionamos 'safety_settings' para evitar bloqueios falsos positivos
             try:
                 model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
                 response = model.generate_content(
