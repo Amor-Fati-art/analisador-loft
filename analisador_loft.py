@@ -353,15 +353,25 @@ Item: Cortina da Sala Rasgada
 Decisão: NEGADO
 Motivo: Pagamento negado... item não fixo/mobília.
 
---- EXEMPLO 6 (NOVO) ---
+--- EXEMPLO 6 (SEGURANÇA) ---
 Item: Chave do portão
 Decisão: APROVADO
 Motivo: Item de segurança essencial/restituição obrigatória.
 
---- EXEMPLO 7 (NOVO) ---
+--- EXEMPLO 7 (SEGURANÇA) ---
 Item: Cadeado pado
 Decisão: APROVADO
 Motivo: Item de segurança essencial/restituição obrigatória.
+
+--- EXEMPLO 8 (ITEM MÓVEL) ---
+Item: Assento de Vaso Sanitário
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: item não fixo/mobília.
+
+--- EXEMPLO 9 (ITEM MÓVEL) ---
+Item: Ralo do Banheiro
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: item não fixo/mobília.
 
 
 Valores Aprovados:
@@ -495,7 +505,11 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
     prompt.append("--- FIM DAS REGRAS OFICIAIS ---")
     
     prompt.append("""
-    \nAGORA, COM BASE NO TEXTO ACIMA, APLIQUE AS SEGUINTES REGRAS OPERACIONAIS DE DECISÃO:
+    \nAGORA, COM BASE NO TEXTO ACIMA, APLIQUE AS SEGUINTES REGRAS OPERACIONAIS DE DECISÃO EM ORDEM DE PRIORIDADE:
+    
+    0. **REGRA SUPREMA: ITENS REMOVÍVEIS**: Se o item for **ASSENTO DE VASO, TAMPA DE VASO, RALO ou GRELHA**, você deve **NEGAR** (Red).
+       - Motivo OBRIGATÓRIO: "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
+       - Obs: Isso vale MESMO que o item esteja quebrado ou faltando. A regra de item removível prevalece sobre furto.
     
     1. **Pintura Interna e Danos Físicos Internos**: O texto diz que 'Podem ser cobrados como reparos: Pintura e Conserto de danos'. Logo, se for Pintura Interna, Buracos na Parede, Piso/Azulejo Quebrado ou Danificado (Interno): APROVAR (Green).
     
