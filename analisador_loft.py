@@ -229,7 +229,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🏢 Auditor Loft - Base Integrada")
+st.title("🏢 Auditor Loft - Base Integrada (V2.0)")
 st.caption("Sistema carregado com: Base de Conhecimento Oficial + Seus Exemplos de Treinamento")
 
 col1, col2 = st.columns(2)
@@ -255,9 +255,8 @@ if st.button("🔍 ANALISAR AGORA"):
     with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
         genai.configure(api_key=CHAVE_SECRETA)
         
-        # --- CORREÇÃO AQUI: Mudamos para gemini-1.5-pro ---
-        model = genai.GenerativeModel('gemini-1.5-pro', generation_config={"response_mime_type": "application/json"})
-        # --------------------------------------------------
+        # --- AQUI ESTÁ O 2.0 (EXPERIMENTAL) ---
+        model = genai.GenerativeModel('gemini-2.0-flash-exp', generation_config={"response_mime_type": "application/json"})
         
         # Montagem do Prompt
         prompt = [BASE_CONHECIMENTO]
