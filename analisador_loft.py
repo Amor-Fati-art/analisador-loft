@@ -5,19 +5,21 @@ import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
 try:
+    # Tenta buscar a chave nos "Cofres" do site (Streamlit Cloud)
     CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
 except (FileNotFoundError, KeyError):
-    CHAVE_SECRETA = "AIzaSyDHG1S0UljyHyuA2agXdw0v9ilYBCltIaY"
+    # SE FALHAR (NO SEU PC), USA ESTA NOVA CHAVE DIRETA:
+    CHAVE_SECRETA = "AIzaSyC9XBUq93SZ8Odkr4LtfoKsJadZ9bmT2DY"
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- AVISO CRÍTICO PARA O ANALISTA (O POP-UP SOLICITADO) ---
+# --- AVISO CRÍTICO PARA O ANALISTA (POP-UP) ---
 st.title("🏢 Auditor Loft - Base Integrada")
 st.warning("""
 ⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
 A IA é uma ferramenta de apoio. **VOCÊ É O RESPONSÁVEL FINAL.**
-* **Verifique o Motivo:** Se for Lâmpada/Ducha, o motivo deve ser "Rede Elétrica/Hidráulica" e não apenas "Desgaste".
-* **Encontrou um erro?** Comunique a supervisão imediatamente para ajustarmos o treinamento.
+* **Verifique o Motivo:** Se for Lâmpada/Ducha/Torneira, o motivo deve ser "Rede Elétrica/Hidráulica" e não apenas "Desgaste".
+* **Itens Faltantes:** Se sumiu, é "Ato Ilícito".
 * **Conferência Visual:** Sempre compare com as fotos antes de finalizar.
 """)
 
