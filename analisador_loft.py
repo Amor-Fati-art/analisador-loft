@@ -1,5 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
+# ADICIONADO: Importação necessária para o filtro de segurança funcionar 100%
+from google.generativeai.types import HarmCategory, HarmBlockThreshold 
 import pandas as pd
 import io
 
@@ -13,14 +15,14 @@ except (FileNotFoundError, KeyError):
 
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
 
-# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (ATIVADA) ---
-# Impede que o Google bloqueie palavras como "quebra", "dano", "furto".
-SAFETY_SETTINGS = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-]
+# --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (CORRIGIDA) ---
+# Usamos a configuração técnica "hardcore" para garantir que NADA seja bloqueado.
+SAFETY_SETTINGS = {
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+}
 
 # --- 3. FUNÇÃO AUXILIAR (PRONTA PARA USO) ---
 def _montar_prompt(base, exemplos, v_ent, v_sai, o_txt, o_arq):
@@ -276,22 +278,22 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- LÓGICA HÍBRIDA ---
-            # CORREÇÃO AQUI: safety_settings agora é enviado para a IA
-            try:
-                model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
-                response = model.generate_content(
-                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
-                    safety_settings=SAFETY_SETTINGS
-                )
-                st.toast("🚀 Usando Gemini 3 Flash (Preview)")
-            except:
-                st.toast("⚠️ Trocando para Gemini 1.5 Flash (Backup)")
-                model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
-                response = model.generate_content(
-                    _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
-                    safety_settings=SAFETY_SETTINGS
-                )
+            # --- CORREÇÃO AQUI ---
+            # 1. Removida a tentativa de usar o 1.5.
+            # 2. Usando gemini-2.0-flash-exp (a versão estável mais nova)
+            # 3. Se você fizer questão do nome "gemini-3-flash-preview", pode mudar abaixo, mas o 2.0 é mais seguro agora.
+            model = genai.GenerativeModel('gemini-2.0-flash-exp', generation_config={"response_mime_type": "application/json"})
+            
+            response = model.generate_content(
+                _montar_prompt(BASE_CONHECIMENTO, EXEMPLOS_TREINAMENTO, vistoria_entrada, vistoria_saida, orcamento_txt, orcamento_arq),
+                safety_settings=SAFETY_SETTINGS
+            )
+            st.toast("🚀 Análise Feita (Segurança Desativada)")
+
+            # Verificação para não dar tela vermelha se a IA falhar silenciosamente
+            if not response.parts:
+                st.error("Erro interno: A IA bloqueou a resposta apesar dos filtros. Tente novamente.")
+                st.stop()
 
             df = pd.read_json(io.StringIO(response.text))
             
