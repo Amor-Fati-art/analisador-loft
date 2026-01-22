@@ -473,7 +473,16 @@ Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 -------------------------------------------
+--- EXEMPLO 6 (NOVO) ---
+Item: Chave do portão
+Decisão: APROVADO
+Motivo: Item de segurança.
 
+--- EXEMPLO 7 (NOVO) ---
+Item: Cadeado pado
+Decisão: APROVADO
+Motivo: Item de segurança.
+"""
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
