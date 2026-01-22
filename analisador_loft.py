@@ -256,7 +256,7 @@ if st.button("🔍 ANALISAR AGORA"):
         genai.configure(api_key=CHAVE_SECRETA)
         
         # --- AQUI ESTÁ O 2.0 (EXPERIMENTAL) ---
-        model = genai.GenerativeModel('gemini-2.0-flash-exp', generation_config={"response_mime_type": "application/json"})
+        model = genai.GenerativeModel('gemini-1.5-pro', generation_config={"response_mime_type": "application/json"})
         
         # Montagem do Prompt
         prompt = [BASE_CONHECIMENTO]
