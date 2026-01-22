@@ -5,7 +5,7 @@ import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA ---
 try:
-    CHAVE_SECRETA = st.secrets["CHAVE_SECRETA"]
+    api_key = st.secrets["CHAVE_SECRETA"]
 except:
     st.error("❌ Erro: Configure a 'CHAVE_SECRETA' nos Secrets do Streamlit.")
     st.stop()
@@ -14,6 +14,9 @@ st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", 
 
 # ==============================================================================
 # 🔴 ÁREA DE TREINAMENTO (Seu Histórico do OneNote)
+# ==============================================================================
+# Cole abaixo os exemplos de casos que você já resolveu.
+# A IA vai usar isso para copiar o seu estilo de decisão.
 # ==============================================================================
 EXEMPLOS_TREINAMENTO = """
 --- EXEMPLO 1 ---
@@ -41,6 +44,7 @@ Item: Cortina da Sala Rasgada
 Decisão: NEGADO
 Motivo: Pagamento negado... item não fixo/mobília.
 
+(Você pode colar mais exemplos aqui embaixo seguindo esse padrão...)
 Valores Aprovados:
 TROCA DO PAPEL DE PAREDE: 780 REAIS
 REFAZER TEXTURA DA PAREDE: 550 REAIS
@@ -152,7 +156,6 @@ Pintura interna: R$ 800,00
 Materiais de pintura: R$ 300,00 
 Limpeza: R$ 200,00 
 Produtos de limpeza: R$ 40,00 
-
 Valores Negados:
 Cozinha - reposição de 01 panela laranja indução 340,00
 Pagamento negado, conforme consta no nosso termo:  
@@ -171,7 +174,12 @@ Pagamento negado, conforme consta no nosso termo:
 Quarto - revisão ar condicionado 220,00
 Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação." 
+
+---------------------------------------------------------
+
 """
+# ==============================================================================
+
 
 # ==============================================================================
 # 🔵 BASE DE CONHECIMENTO (Regras Oficiais Loft Fiança)
@@ -229,7 +237,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🏢 Auditor Loft - Base Integrada (V2.0)")
+st.title("🏢 Auditor Loft - Base Integrada")
 st.caption("Sistema carregado com: Base de Conhecimento Oficial + Seus Exemplos de Treinamento")
 
 col1, col2 = st.columns(2)
@@ -254,9 +262,7 @@ if st.button("🔍 ANALISAR AGORA"):
 
     with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
         genai.configure(api_key=CHAVE_SECRETA)
-        
-        # --- AQUI ESTÁ O 2.0 (EXPERIMENTAL) ---
-        model = genai.GenerativeModel('gemini-1.5-pro', generation_config={"response_mime_type": "application/json"})
+        model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
         
         # Montagem do Prompt
         prompt = [BASE_CONHECIMENTO]
