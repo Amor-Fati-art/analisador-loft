@@ -265,7 +265,9 @@ if st.button("🔍 ANALISAR AGORA"):
 
     with st.status("🤖 Consultando regras e exemplos...", expanded=True) as status:
         genai.configure(api_key=CHAVE_SECRETA)
-        model = genai.GenerativeModel('gemini-1.5-flash', generation_config={"response_mime_type": "application/json"})
+        
+        # ATUALIZADO PARA O MODELO GEMINI 3 FLASH (PREVIEW)
+        model = genai.GenerativeModel('gemini-3-flash-preview', generation_config={"response_mime_type": "application/json"})
         
         # Montagem do Prompt
         prompt = [BASE_CONHECIMENTO]
