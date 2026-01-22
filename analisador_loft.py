@@ -13,7 +13,17 @@ except (FileNotFoundError, KeyError):
     st.info("👉 NO SEU PC: Verifique se o arquivo se chama 'secrets.toml' (sem .txt no final).")
     st.stop()
 
+# Injeção de CSS para garantir que as cores funcionem (Verde, Vermelho e o novo Amarelo)
 st.set_page_config(page_title="Auditor Loft - Versão Final", page_icon="🏢", layout="wide")
+st.markdown("""
+<style>
+.card { padding: 15px; border-radius: 10px; margin-bottom: 10px; background-color: #1e1e1e; border: 1px solid #333; }
+.card-green { border-left: 5px solid #28a745; }
+.card-red { border-left: 5px solid #dc3545; }
+.card-yellow { border-left: 5px solid #ffc107; }
+.price { float: right; font-weight: bold; }
+</style>
+""", unsafe_allow_html=True)
 
 # --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO (ATUALIZADA PARA NÃO FALHAR) ---
 # Usamos a configuração técnica oficial. Isso força a IA a ler "quebra/dano" sem achar que é violência.
@@ -96,7 +106,7 @@ Valores Negados:
 LIMPEZA DA VC DE GORDURA: 480 REAIS
 TROCA DO MOTOR E AQUECEDOR: 9.200 REAIS 
 TROCA DA LÂMPADA DA CHURRASQUEIRA: 35 REAIS
-Motivo: Pagamento negado, conforme consta no nosso termo:  
+Motivo: Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação, danos causados pela ação paulatina de temperatura, umidade, infiltração e vibração, bem como poluição e contaminação decorrente de qualquer causa, inclusive a áreas internas que estejam expostas a este risco." 
 
 REPARO DO FOGÃO : 450 REAIS 
@@ -104,17 +114,17 @@ Motivo: Tendo em vista que a nossa análise é comparativa entre vistorias de en
 Informamos por fim que, a ausência de cobertura pela Loft Fiança não isenta a responsabilidade do locatário com relação aos valores considerados devidos em razão do contrato de locação, podendo a imobiliária cobrar diretamente do inquilino os valores negados.
 
 TROCAR A TORNEIRA DO JARDIM: 35 REAIS 
-Motivo: Pagamento negado, conforme consta no nosso termo:  
+Motivo: Pagamento negado, conforme consta no nosso termo:  
 "Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos." 
 
 TROCA DO ESPELHO DO BANHEIRO DA PISCINA: 150 REAIS 
-Motivo: Pagamento negado, conforme consta no nosso termo:  
+Motivo: Pagamento negado, conforme consta no nosso termo:  
 "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparável ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada." 
 
 Valores Negados:
 Motor piscina R$ 6.866,00 
 Motivo: 
-O pagamento foi negado, conforme previsto em nosso termo, que exclui a cobertura para: "Danos nas redes hidráulicas e elétricas que não consistam em danos aparentes e de acabamentos externos."  
+O pagamento foi negado, conforme previsto em nosso termo, que exclui a cobertura para: "Danos nas redes hidráulicas e elétricas que não consistam em danos aparentes e de acabamentos externos."  
 -----------------------------------------------------
 • Pintura interna: R$ 2.752,50
 • Limpeza geral do imovel: R$ 240,00
@@ -128,7 +138,7 @@ Reparos:
 • Armário: Acabamento soltando na lateral direita, fazer fixação: R$ 200,00
 Motivo da negativa:
 Valores Contratados: Independentemente da anuência do(s) Locatário(s) e/ou Corresponsável(eis), as despesas que venham a ser indicadas pela Imobiliária para fins de composição do Valor Locatício, a Fiança Loft será prestada para fins de pagamento dos Valores Contratados, que incluem:
-(iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.
+(iv)  Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos.
 Valor total negado: R$ 1.225,25
 ------------------------------------------------
 Valor(es) aprovado(s)
@@ -145,7 +155,7 @@ Reparos:
 • Repor telhas: R$ 800,00
 Motivo da negativa:
 Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
-(xii)  danos estruturais nos telhados e/ou porção diversa do imóvel decorrentes de caso fortuito e/ou força maior ou, ainda, de dolo do(s) Locatário(s).
+(xii)  danos estruturais nos telhados e/ou porção diversa do imóvel decorrentes de caso fortuito e/ou força maior ou, ainda, de dolo do(s) Locatário(s).
 • Troca de chuveiro: R$ 210,00
 • Troca de ducha higiênica: R$ 120,00
 • Troca de lâmpadas: R$ 80,00
@@ -197,7 +207,7 @@ Limpeza: R$ 200,00
 Produtos de limpeza: R$ 40,00 
 Valores Negados:
 Cozinha - reposição de 01 panela laranja indução 340,00
-Pagamento negado, conforme consta no nosso termo:  
+Pagamento negado, conforme consta no nosso termo:  
 "Danos causados por atos ilícitos, dolosos ou por culpa grave, equiparáveis ao dolo, praticados pelo(s) Locatário(s), ou por pessoa a ele(s) vinculada." 
 
 Cozinha - banco realizar higienização 70,00
@@ -207,16 +217,16 @@ Sacada - troca varal portátil 180,00
 Sala e corredor - higienização sofá 220,00
 Sala e corredor - painel rack, remover gaveta para retirada papeis 10,00
 Sala e corredor - tapete higienização 190,00
-Pagamento negado, conforme consta no nosso termo:  
+Pagamento negado, conforme consta no nosso termo:  
 "Danos causados ao imóvel, assim como a eventuais móveis embutidos e equipamentos fixos." 
 
 Quarto - revisão ar condicionado 220,00
-Pagamento negado, conforme consta no nosso termo:  
+Pagamento negado, conforme consta no nosso termo:  
 "Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação." 
 """
 
 # ==============================================================================
-# 🔵 BASE DE CONHECIMENTO (DE/PARA OBRIGATÓRIO)
+# 🔵 BASE DE CONHECIMENTO (COM A NOVA REGRA DA PINTURA EXTERNA)
 # ==============================================================================
 BASE_CONHECIMENTO = """
 VOCÊ É UM ANALISTA DE REPAROS DA LOFT FIANÇA.
@@ -250,8 +260,16 @@ TYPE E: DESGASTE REAL (PINTURA INTERNA VELHA, RISCOS LEVES PISO)
 -> **DECISÃO:** NEGAR.
 -> **MOTIVO OBRIGATÓRIO (USO NORMAL):** "Pagamento negado, conforme consta no nosso termo: Quaisquer deteriorações decorrentes do uso normal do imóvel, objeto do Contrato de Locação."
 
+🟡 **TYPE F: PINTURA EXTERNA (REGRA ESPECIAL)**
+-> Se o item for Pintura Externa, Pintura de Muro, Pintura de Fachada:
+1. Verifique se o texto do orçamento diz explicitamente "COM COBERTURA", "COBERTO" ou similar.
+   -> Se sim: **DECISÃO: APROVADO**.
+2. Se NÃO mencionar cobertura explicitamente:
+   -> **DECISÃO: VERIFICAR**.
+   -> **MOTIVO:** "Item de Pintura Externa: Necessário verificação visual da cobertura na foto. Se não houver cobertura, negar por Ação do Tempo."
+
 FORMATO DE SAÍDA JSON:
-[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado", "Motivo": "Texto da regra exata"}]
+[{"Item": "Nome", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Texto da regra exata"}]
 """
 
 col1, col2 = st.columns(2)
@@ -278,9 +296,7 @@ if st.button("🔍 ANALISAR AGORA"):
         try:
             genai.configure(api_key=CHAVE_SECRETA)
             
-            # --- ATUALIZAÇÃO PARA GEMINI 3.0 ---
-            # Aqui está o modelo que você pediu (gemini-2.5-flash)
-            # A configuração 'safety_settings' agora usa o formato técnico correto.
+            # --- MODELO ATUALIZADO (2.5 FLASH) ---
             model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
             
             response = model.generate_content(
@@ -288,7 +304,6 @@ if st.button("🔍 ANALISAR AGORA"):
                 safety_settings=SAFETY_SETTINGS
             )
             
-            # Verificamos se há resposta válida antes de tentar ler
             if not response.parts:
                 st.error("Erro no retorno da IA. Tente novamente em alguns segundos.")
                 st.stop()
@@ -297,16 +312,24 @@ if st.button("🔍 ANALISAR AGORA"):
             
             status.update(label="✅ Análise Concluída", state="complete", expanded=False)
             
-            # --- RESULTADOS ---
+            # --- RESULTADOS COM SEPARAÇÃO POR STATUS ---
             st.divider()
             
             aprovados = df[df['Status'].str.contains("Aprovado", case=False)]
+            # NOVA LÓGICA: Captura itens "Verificar" para mostrar em Amarelo
+            verificar = df[df['Status'].str.contains("Verificar|Atenção", case=False)]
             negados = df[df['Status'].str.contains("Negado", case=False)]
             
             if not aprovados.empty:
                 st.subheader("✅ Aprovados")
                 for i, r in aprovados.iterrows():
                     st.markdown(f'<div class="card card-green"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
+
+            # BLOCO AMARELO (NOVIDADE)
+            if not verificar.empty:
+                st.subheader("⚠️ Atenção: Verificar Visualmente (Pintura Externa)")
+                for i, r in verificar.iterrows():
+                    st.markdown(f'<div class="card card-yellow"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small style="color: #FFC107">{r["Motivo"]}</small></div>', unsafe_allow_html=True)
 
             if not negados.empty:
                 st.subheader("⛔ Negados")
@@ -324,6 +347,12 @@ if st.button("🔍 ANALISAR AGORA"):
                 txt_relatorio += "✅ APROVADOS:\n"
                 for i, r in aprovados.iterrows():
                     txt_relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
+
+            if not verificar.empty:
+                txt_relatorio += "\n⚠️ VERIFICAR COBERTURA VISUALMENTE:\n"
+                for i, r in verificar.iterrows():
+                    txt_relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
+                    txt_relatorio += f"    Obs: {r['Motivo']}\n"
             
             if not negados.empty:
                 txt_relatorio += "\n⛔ NEGADOS:\n"
