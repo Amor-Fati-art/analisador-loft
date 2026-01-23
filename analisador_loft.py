@@ -643,7 +643,7 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
 st.title("🏢 Auditor Loft - Base Oficial Integrada")
 st.warning("""
 ⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
-A IA é uma ferramenta de apoi, verifique se os valores foram analise correto antes de aprovar. **VOCÊ É O RESPONSÁVEL FINAL.**
+A IA é uma ferramenta de apoio, antes de aprovar, verifique se o orçamento foi aprovado e negado de forma correta antes de prosseguir. **VOCÊ É O RESPONSÁVEL FINAL.**
 """)
 
 col1, col2 = st.columns(2)
