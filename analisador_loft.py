@@ -21,7 +21,35 @@ st.markdown("""
 .price { float: right; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
-
+# --- BARRA LATERAL (LINK PARA SHAREPOINT) ---
+with st.sidebar:
+    st.header("🆘 Central de Ajuda")
+    
+    st.warning(
+        """
+        ⚠️ **Aviso de Falibilidade**
+        
+        A IA é uma ferramenta de apoio. Se o motivo da negativa parecer errado, consulte a **Base Oficial**.
+        """
+    )
+    
+    # Link do SharePoint da Loft
+    url_sharepoint = "https://loftms365.sharepoint.com/sites/baseconhecimentoinadimplncia/SitePages/Planos%20e%20coberturas/Regras-de-cobertura-para-multas-rescisórias,-aviso-prévio-e-reparos.aspx?web=1"
+    
+    st.link_button("🔗 Abrir Base de Conhecimento", url_sharepoint)
+    
+    st.divider()
+    
+    # Resumo rápido para consulta imediata
+    with st.expander("📖 Regras Rápidas (Resumo)"):
+        st.markdown("""
+        - **Chaves/Cadeados:** APROVAR (Segurança).
+        - **Limpeza Geral:** APROVAR.
+        - **Limpeza Sofá/Cortina:** NEGAR (Item Móvel).
+        - **Torneira Pingando:** NEGAR (Manutenção).
+        - **Torneira Quebrada:** APROVAR (Dano).
+        - **Vidro Quebrado:** APROVAR.
+        """)
 # --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO ---
 SAFETY_SETTINGS = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
