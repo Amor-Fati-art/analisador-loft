@@ -29,7 +29,7 @@ with st.sidebar:
         """
         ⚠️ **Aviso de Falibilidade**
         
-        A IA é uma ferramenta de apoio. Se o motivo da negativa parecer errado, consulte a **Base Oficial**.
+        A IA é uma ferramenta de apoio e pode cometer erros. Se o motivo da negativa parecer errado, consulte a **Base Oficial**.
         """
     )
     
