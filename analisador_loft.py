@@ -525,11 +525,12 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
     3. **Itens Faltantes / Furtados**: O texto classifica como 'Ato Ilícito' e diz que a 'Loft Fiança não cobre'. Portanto: NEGAR (Red).
        🔴 **EXCEÇÃO CRÍTICA (SEGURANÇA):** Se o item faltante for **CHAVE, CADEADO ou CONTROLE DE PORTÃO**, você deve **APROVAR** (Green). Motivo: Item de segurança essencial, deve ser restituído.
     
-    4. **Torneiras e Hidráulica (Regra de Incerteza)**: 
-       - Se o orçamento disser "Vazamento" ou "Pingando" -> NEGAR (Vermelho - Manutenção).
+    4. **Torneiras, Chuveiros, Luminárias e Hidráulica/Elétrica**: 
+       - Se o orçamento disser "Não funcionando", "Queimada", "Vazamento", "Pingando" ou "Curto" -> NEGAR (Vermelho - Defeito Funcional/Rede).
+       - Se o orçamento disser "Cano quebrado na parede", "Quebra na rosca/conexão" ou "Entrada da conexão" -> NEGAR (Vermelho - Problema na Rede Hidráulica).
        - Se o orçamento disser "Faltando" -> NEGAR (Vermelho - Ato Ilícito).
-       - Se o orçamento disser "Quebrada", "Trocada" -> APROVAR (Verde - Dano do inquilino).
-       - ⚠️ **Se o orçamento disser APENAS "Danificada", "Com defeito" ou "Reparo" sem explicar o motivo -> VERIFICAR (Amarelo). Motivo: Verificar se é vazamento ou quebra física.**
+       - Apenas se for "Louça Quebrada" (ex: pia partida ao meio) ou "Vidro Quebrado" -> APROVAR (Verde).
+       - ⚠️ Demais casos genéricos ("Danificada", "Com defeito") -> VERIFICAR (Amarelo).
     
     5. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
     
