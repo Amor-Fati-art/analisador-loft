@@ -19,6 +19,19 @@ st.markdown("""
 .card-red { border-left: 5px solid #dc3545; }
 .card-yellow { border-left: 5px solid #ffc107; }
 .price { float: right; font-weight: bold; }
+
+/* --- NOVO CÓDIGO (COLE AQUI) --- */
+[data-testid="stFileUploader"] section > div > div > span {
+    display: none;
+}
+[data-testid="stFileUploader"] section > div > div > small {
+    display: none;
+}
+[data-testid="stFileUploader"] button {
+    width: 100%;
+}
+/* ------------------------------- */
+
 </style>
 """, unsafe_allow_html=True)
 # --- BARRA LATERAL (LINK PARA SHAREPOINT) ---
