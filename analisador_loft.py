@@ -499,6 +499,56 @@ Reparos:
 • Pintura interna: R$ 1.635,00
 (com bônus Refera aplicado, total: R$ 1.798,50)
 Valor total aprovado: R$ 1.798,50
+Valor(es) aprovado(s)
+Reparos:
+• Pintura interna do imóvel –: R$ 1.400,00
+• Limpeza geral do imóvel –: R$ 250,00
+• Restauração da parte inferior da porta – cozinha –: R$ 100,00
+• Restauração do piso cerâmico – quarto –: R$ 100,00
+• Descarte de objetos –: R$ 80,00
+• Remoção de móvel – banheiro –: R$ 60,00
+• Remoção de manchas de ferrugem no piso cerâmico – área de serviço –: R$ 60,00
+• Remoção de encanamento – cozinha –: R$ 60,00
+• Reposição de 1 chave da porta de entrada –: R$ 50,00
+• Remoção de acessório fixado na parede – banheiro –: R$ 35,00
+• Remoção de manchas no piso cerâmico – banheiro –: R$ 35,00
+Valor total aprovado: R$ 2.230,00
+Valor(es) negado(s)
+Reparos:
+• Troca de chuveiro – banheiro –: R$ 200,00
+Motivo da negativa:
+Exclusões dos Valores Contratados: A obrigação da Loft quanto ao pagamento de Valores Contratados inadimplidos pelo(s) Locatário(s) não incluem responsabilidade em relação ao pagamento de despesas e danos decorrentes de:
+(xi) danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+• Remoção de mancha da cuba – banheiro –: R$ 150,00
+Motivo da negativa:
+Negado, tendo em vista que o valor informado é incluso dentro da limpeza geral.
+Valor total negado: R$ 350,00
+
+--- EXEMPLO 10 (ELETRICA FUNCIONAL) ---
+Item: Luminária arandela não funcionando
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+
+--- EXEMPLO 11 (HIDRAULICA CONEXAO) ---
+Item: Chuveiro com cano quebrado na entrada da conexão
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
+--------------------------------------------
+--- EXEMPLO 12 (LIMPEZA MOBILIA) ---
+Item: Higienização do Sofá
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: item não fixo/mobília.
+
+--- EXEMPLO 13 (LIMPEZA MOBILIA) ---
+Item: Lavagem de Cortinas
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: item não fixo/mobília.
+
+--- EXEMPLO 14 (LIMPEZA ESTRUTURAL) ---
+Item: Remoção mancha da cuba - banheiro
+Decisão: APROVADO
+Motivo: Limpeza de item fixo (cuba).
+
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -535,6 +585,10 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
     5. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
     
     6. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green).
+                  **Limpeza (Regra de Fixo vs Móvel)**: 
+       - **APROVAR (Green):** Limpeza Geral, Faxina, Chão, Paredes, Vidros, Pias, Cubas, Banheiros (Itens fixos na estrutura).
+       - **NEGAR (Red):** Limpeza/Higienização de ITENS MÓVEIS (Sofá, Cortina, Tapete solto, Colchão, Cama, Eletrodomésticos). 
+       - Motivo da Negativa para Móveis: "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
