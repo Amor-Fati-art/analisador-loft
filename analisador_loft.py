@@ -611,6 +611,20 @@ Item: Remoção mancha da cuba - banheiro
 Decisão: APROVADO
 Motivo: Limpeza de item fixo (cuba).
 
+--- EXEMPLO 15 (DEDETIZACAO SEM LAUDO) ---
+Item: Serviço de Dedetização Geral
+Decisão: VERIFICAR
+Motivo: Necessário verificar se existe laudo técnico comprovando que a infestação foi causada por falta de higiene do inquilino.
+
+--- EXEMPLO 16 (DEDETIZACAO COM LAUDO DE HIGIENE) ---
+Item: Dedetização (Laudo anexo aponta infestação por acúmulo de lixo/restos de comida)
+Decisão: APROVADO
+Motivo: Infestação causada por falta de higiene comprovada em laudo.
+
+--- EXEMPLO 17 (DEDETIZACAO ESTRUTURAL) ---
+Item: Dedetização de Cupim (Estrutura do armário podre)
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: pragas sem comprovação de falta de higiene (possível causa estrutural/tempo).
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -645,6 +659,13 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
        - ⚠️ Demais casos genéricos ("Danificada", "Com defeito") -> VERIFICAR (Amarelo).
     
     5. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
+                  Infestação de Pragas e Dedetização
+
+Danos causados por infestação de pragas podem ser de responsabilidade do inquilino apenas quando houver indícios claros de falta de higiene.
+• A dedetização só deve ser aprovada quando houver LAUDO TÉCNICO que comprove a necessidade.
+• O laudo deve ser detalhado, indicando: tipo de praga, origem e recomendação técnica.
+
+Atenção: Antes de aprovar, é obrigatório conferir se o laudo técnico está anexado e se a causa é responsabilidade do inquilino. Sem laudo, a cobrança é indevida.
     
     6. **Limpeza**: O texto diz 'Podem ser cobrados... Limpeza do imóvel'. APROVAR (Green).
                   **Limpeza (Regra de Fixo vs Móvel)**: 
