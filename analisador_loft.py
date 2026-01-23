@@ -43,12 +43,31 @@ with st.sidebar:
     # Resumo rápido para consulta imediata
     with st.expander("📖 Regras Rápidas (Resumo)"):
         st.markdown("""
-        - **Chaves/Cadeados:** APROVAR (Segurança).
-        - **Limpeza Geral:** APROVAR.
-        - **Limpeza Sofá/Cortina:** NEGAR (Item Móvel).
-        - **Torneira Pingando:** NEGAR (Manutenção).
-        - **Torneira Quebrada:** APROVAR (Dano).
-        - **Vidro Quebrado:** APROVAR.
+     Reposição de lâmpada faltante – Negar.
+• Troca de chuveiro – Aprovar em caso de troca de modelo ou quando houver dano visível; negar quando
+estiver queimado ou quando não houver chuveiro na vistoria de saída.
+• Tomadas ou interruptores quebrados/arrancados – Aprovar.
+• Lâmpadas embutidas quebradas ou modificadas (troca de marca e modelo) – Avaliar conforme laudo/fotos.
+• Móveis danificados – Aprovar desde que sejam fixos/embutidos (colados à parede ou suspensos).
+• Danos causados por infestação de pragas – Aprovar se a causa for falta de higiene do inquilino.
+• Pias e bancadas – Aprovar quando forem fixas (sem pés).
+• Louças sanitárias: vasos sanitários, bidês e cubas de pia (quando fixas) – Aprovar.
+• Portas e janelas, com seus batentes, maçanetas, dobradiças e vidros – Aprovar quando houver danos
+identificados nas fotos.
+• Pisos e revestimentos – Aprovar.
+• Espelhos grandes e fixos (colados ou parafusados diretamente na parede) – Aprovar.
+• Iluminação embutida (spots, luminárias de teto que integram a instalação) – Aprovar quando
+danificados/quebrados; negar quando apenas queimados.
+• Painéis de TV planejados ou fixos (aparafusados ou integrados à parede/móvel) – Aprovar.
+• Aquecedores a gás instalados permanentemente – Aprovar.
+• Interfones e caixas de correio que integram a infraestrutura do imóvel – Aprovar.
+• Troca de sifão – Negar.
+• Desobstrução – Aprovar apenas quando o entupimento for causado por mau uso do inquilino; caso contrário,
+negar.
+• Manutenção de ar condicionado – Negar.
+• Pintura externa – Pagar somente a área coberta com danos visíveis (mancha de pata, pneu de bicicleta ou
+alteração de cor).
+
         """)
 # --- 2. CONFIGURAÇÃO ANTI-BLOQUEIO ---
 SAFETY_SETTINGS = {
