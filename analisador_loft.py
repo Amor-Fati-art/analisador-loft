@@ -638,6 +638,16 @@ Motivo: Infestação causada por falta de higiene comprovada em laudo.
 Item: Dedetização de Cupim (Estrutura do armário podre)
 Decisão: NEGADO
 Motivo: Pagamento negado, conforme consta no nosso termo: pragas sem comprovação de falta de higiene (possível causa estrutural/tempo).
+
+--- EXEMPLO 18 (PORTAO MANUTENCAO) ---
+Item: Reparo de Portão (Enroscando / Lubrificação / Regulagem)
+Decisão: NEGADO
+Motivo: Pagamento negado. Manutenção preventiva (regulagem/lubrificação) ou desgaste natural de uso.
+
+--- EXEMPLO 19 (PORTAO DANO) ---
+Item: Reparo de Portão (Batido/Amassado por veículo)
+Decisão: APROVADO
+Motivo: Dano físico causado por impacto (mau uso).
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -686,6 +696,11 @@ Atenção: Antes de aprovar, é obrigatório conferir se o laudo técnico está 
        - **NEGAR (Red):** Limpeza/Higienização de ITENS MÓVEIS (Sofá, Cortina, Tapete solto, Colchão, Cama, Eletrodomésticos). 
        - Motivo da Negativa para Móveis: "Pagamento negado, conforme consta no nosso termo: item não fixo/mobília."
 
+                  **Portões, Janelas e Esquadrias (Regra de Manutenção)**:
+       - Se o problema for "Enroscando", "Travando", "Rangendo", "Duro para abrir" -> **NEGAR** (Red).
+       - Se o serviço for "Lubrificação", "Regulagem", "Ajuste", "Desmontagem para teste" ou "Limpeza de trilho" -> **NEGAR** (Red).
+       - Motivo: "Pagamento negado. Manutenção preventiva (regulagem/lubrificação) ou desgaste natural de uso."
+       - Apenas se for "Amassado", "Batido", "Arrancado" ou "Quebrado fisicamente" -> **APROVAR** (Green).
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
     """)
