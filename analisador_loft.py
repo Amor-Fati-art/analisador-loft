@@ -726,6 +726,10 @@ Novos Exemplos: Ensinar que "Janela" solta é incerteza, e não crime.
        - ⛔ **PROIBIDO:** NÃO marque Janelas ou Tomadas como "Ato Ilícito" a menos que esteja escrito explicitamente "FURTADA", "ROUBADA" ou "RETIRADA".
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
+    REGRA DE CÁLCULO DA 'CERTEZA' (0 a 100):
+    - Se a regra aplicável for clara e direta (Ex: Limpeza Geral, Chave Faltando, Pintura Interna): Certeza entre 90 e 100.
+    - Se o item cair em uma regra de "VERIFICAR" ou "AMARELO" (depende de foto/laudo): Certeza entre 40 e 60.
+    - Se a descrição for vaga: Certeza baixa.
     """)
     
     prompt.append("\nHISTÓRICO DE CASOS PASSADOS (EXEMPLOS PRÁTICOS):")
