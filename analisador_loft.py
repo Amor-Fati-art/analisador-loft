@@ -662,6 +662,10 @@ Motivo: Descrição vaga. Verificar se é vidro quebrado (Aprova) ou apenas regu
 Item: Tomadas
 Decisão: VERIFICAR
 Motivo: Descrição vaga. Se estiver quebrada/fios soltos (Aprova), se for mau contato interno (Nega).
+--- EXEMPLO 20 (HIDRAULICA ENTUPIMENTO) ---
+Item: Desentupimento de ralo/pia/vaso
+Decisão: NEGADO
+Motivo: Pagamento negado, conforme consta no nosso termo: Danos nas redes hidráulicas e elétricas, que não consistam em danos aparentes e acabamentos externos.
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -688,13 +692,14 @@ def _montar_prompt(regras, exemplos, v_ent, v_sai, o_txt, o_arq):
     3. **Itens Faltantes / Furtados**: O texto classifica como 'Ato Ilícito' e diz que a 'Loft Fiança não cobre'. Portanto: NEGAR (Red).
        🔴 **EXCEÇÃO CRÍTICA (SEGURANÇA):** Se o item faltante for **CHAVE, CADEADO ou CONTROLE DE PORTÃO**, você deve **APROVAR** (Green). Motivo: Item de segurança essencial, deve ser restituído.
     
-    4. **Torneiras, Chuveiros, Luminárias e Hidráulica/Elétrica**: 
+   4 **Torneiras e Hidráulica (Regra de Incerteza)**: 
+       - Se o item for **"Desentupimento"**, **"Entupimento"** ou **"Limpeza de Sifão/Caixa de Gordura"** -> **NEGAR** (Vermelho). Motivo: Dano Hidráulico/Manutenção.
        - Se o orçamento disser "Não funcionando", "Queimada", "Vazamento", "Pingando" ou "Curto" -> NEGAR (Vermelho - Defeito Funcional/Rede).
        - Se o orçamento disser "Cano quebrado na parede", "Quebra na rosca/conexão" ou "Entrada da conexão" -> NEGAR (Vermelho - Problema na Rede Hidráulica).
        - Se o orçamento disser "Faltando" -> NEGAR (Vermelho - Ato Ilícito).
-       - Apenas se for "Louça Quebrada" (ex: pia partida ao meio) ou "Vidro Quebrado" -> APROVAR (Verde).
+       - Se o orçamento disser "Quebrada", "Trocada" -> APROVAR (Verde - Dano do inquilino).
        - ⚠️ Demais casos genéricos ("Danificada", "Com defeito") -> VERIFICAR (Amarelo).
-    
+                  
     5. **Desgaste Natural / Ação do Tempo**: Use o motivo de negativa exato do texto oficial para NEGAR (Red).
                   Infestação de Pragas e Dedetização
 
