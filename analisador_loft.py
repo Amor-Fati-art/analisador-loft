@@ -648,6 +648,20 @@ Motivo: Pagamento negado. Manutenção preventiva (regulagem/lubrificação) ou 
 Item: Reparo de Portão (Batido/Amassado por veículo)
 Decisão: APROVADO
 Motivo: Dano físico causado por impacto (mau uso).
+--- EXEMPLO 17 (PORTAO MANUTENCAO) ---
+Item: Reparo de Portão (Enroscando / Lubrificação / Regulagem)
+Decisão: NEGADO
+Motivo: Pagamento negado. Manutenção preventiva (regulagem/lubrificação) ou desgaste natural de uso.
+
+--- EXEMPLO 18 (JANELA VAGA) ---
+Item: Reparo Janela Quarto
+Decisão: VERIFICAR
+Motivo: Descrição vaga. Verificar se é vidro quebrado (Aprova) ou apenas regulagem/lubrificação (Nega).
+
+--- EXEMPLO 19 (TOMADA SOLTA) ---
+Item: Tomadas
+Decisão: VERIFICAR
+Motivo: Descrição vaga. Se estiver quebrada/fios soltos (Aprova), se for mau contato interno (Nega).
 """
 
 # --- 5. FUNÇÃO AUXILIAR ---
@@ -701,6 +715,15 @@ Atenção: Antes de aprovar, é obrigatório conferir se o laudo técnico está 
        - Se o serviço for "Lubrificação", "Regulagem", "Ajuste", "Desmontagem para teste" ou "Limpeza de trilho" -> **NEGAR** (Red).
        - Motivo: "Pagamento negado. Manutenção preventiva (regulagem/lubrificação) ou desgaste natural de uso."
        - Apenas se for "Amassado", "Batido", "Arrancado" ou "Quebrado fisicamente" -> **APROVAR** (Green).
+       Regra 8 (Janelas/Portões): Deixar explícito que se o defeito não for citado, deve ser AMARELO (Verificar) e nunca Vermelho (Ato Ilícito).
+
+Novos Exemplos: Ensinar que "Janela" solta é incerteza, e não crime.
+8. **Portões, Janelas, Esquadrias e Tomadas (Regra de Manutenção)**:
+       - Se o problema for "Enroscando", "Travando", "Rangendo", "Duro para abrir" -> **NEGAR** (Red - Manutenção).
+       - Se o serviço for "Lubrificação", "Regulagem", "Ajuste", "Desmontagem para teste" ou "Limpeza de trilho" -> **NEGAR** (Red - Manutenção).
+       - Apenas se for "Amassado", "Batido", "Arrancado" ou "Quebrado fisicamente" -> **APROVAR** (Green).
+       - ⚠️ **ATENÇÃO:** Se o item for apenas "Janela" ou "Tomada" sem descrição do defeito, marque como **VERIFICAR (Yellow)**. 
+       - ⛔ **PROIBIDO:** NÃO marque Janelas ou Tomadas como "Ato Ilícito" a menos que esteja escrito explicitamente "FURTADA", "ROUBADA" ou "RETIRADA".
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
     """)
