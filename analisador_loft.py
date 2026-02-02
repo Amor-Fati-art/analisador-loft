@@ -246,7 +246,7 @@ Quebra de louças sanitárias (vaso sanitário, pia) ou espelhos por impacto.
 Torneiras quebradas, ou modificados (troca de marca e modelo).
 Chuveiros quebrados ou modificados (troca de marca e modelo).
 Lâmpadas embutidas quebradas, ou modificadas (troca de marca e modelo).
- 
+ Persianas realizamos a aprovação
 Outros:
 Móveis danificados (se o imóvel for mobiliado com armários fixos e embutidos) por mau uso (armários arranhadas profundamente, quebrados).
 Entupimentos de ralos e vasos sanitários por descarte incorreto de lixo.
@@ -731,6 +731,20 @@ Novos Exemplos: Ensinar que "Janela" solta é incerteza, e não crime.
        - ⛔ **PROIBIDO:** NÃO marque Janelas ou Tomadas como "Ato Ilícito" a menos que esteja escrito explicitamente "FURTADA", "ROUBADA" ou "RETIRADA".
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
+    REGRA DE CÁLCULO DA 'CERTEZA' (0 a 100):
+    - Se a regra aplicável for clara e direta (Ex: Limpeza Geral, Chave Faltando, Pintura Interna): Certeza entre 90 e 100.
+    - Se o item cair em uma regra de "VERIFICAR" ou "AMARELO" (depende de foto/laudo): Certeza entre 40 e 60.
+    - Se a descrição for vaga: Certeza baixa.
+    9. **REGRA CRÍTICA DE DESCONTOS (TOTAL GERAL)**:
+       - OBRIGATÓRIO: Verifique no final do documento, na seção de TOTAIS ou RESUMO FINANCEIRO, se existe um campo "Desconto", "Abatimento" ou "Desconto Promocional".
+       - Se existir, VOCÊ DEVE ADICIONAR UM ITEM NO JSON CHAMADO "DESCONTO APLICADO EM ORÇAMENTO".
+       - O VALOR DESTE ITEM DEVE SER NEGATIVO (Exemplo: Se o desconto é 740, coloque -740.00).
+       - Status: "Aprovado" (Green).
+       - Motivo: "Desconto concedido pela imobiliária/prestador no documento original."
+
+    FORMATO DE SAÍDA JSON OBRIGATÓRIO:
+    [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
+    
     REGRA DE CÁLCULO DA 'CERTEZA' (0 a 100):
     - Se a regra aplicável for clara e direta (Ex: Limpeza Geral, Chave Faltando, Pintura Interna): Certeza entre 90 e 100.
     - Se o item cair em uma regra de "VERIFICAR" ou "AMARELO" (depende de foto/laudo): Certeza entre 40 e 60.
