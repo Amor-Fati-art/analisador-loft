@@ -838,36 +838,43 @@ if st.button("🔍 ANALISAR AGORA"):
                 for i, r in negados.iterrows():
                     st.markdown(f'<div class="card card-red"><b>{r["Item"]}</b><span class="price">R$ {r["Valor"]:.2f}</span><br><small>{r["Motivo"]}</small></div>', unsafe_allow_html=True)
             
-            # --- RELATÓRIO ---
+           # --- RELATÓRIO ---
             st.divider()
             st.subheader("📋 Relatório Final (Baseado no Termo)")
             
             txt_relatorio = "RELATÓRIO TÉCNICO - ANÁLISE DE REPAROS\n"
             txt_relatorio += "======================================\n"
             
+            # 1. Lista os Aprovados
             if not aprovados.empty:
                 txt_relatorio += "✅ APROVADOS:\n"
                 for i, r in aprovados.iterrows():
                     txt_relatorio += f"[+] {r['Item']} | R$ {r['Valor']:.2f}\n"
 
+            # 2. Lista os para Verificar
             if not verificar.empty:
                 txt_relatorio += "\n⚠️ VERIFICAR (INCERTEZA NO ITEM):\n"
                 for i, r in verificar.iterrows():
                     txt_relatorio += f"[?] {r['Item']} | R$ {r['Valor']:.2f}\n"
                     txt_relatorio += f"    Obs: {r['Motivo']}\n"
             
+            # 3. Lista os Negados
             if not negados.empty:
                 txt_relatorio += "\n⛔ NEGADOS:\n"
                 for i, r in negados.iterrows():
                     txt_relatorio += f"[-] {r['Item']} | R$ {r['Valor']:.2f}\n"
                     txt_relatorio += f"    Motivo: {r['Motivo']}\n"
             
+            # --- CÁLCULO DOS TOTAIS E RESUMO FINAL ---
             val_total = df['Valor'].sum()
             val_aprov = aprovados['Valor'].sum() if not aprovados.empty else 0
+            val_negado = negados['Valor'].sum() if not negados.empty else 0
             
             txt_relatorio += "\n======================================\n"
-            txt_relatorio += f"TOTAL SOLICITADO: R$ {val_total:.2f}\n"
-            txt_relatorio += f"TOTAL APROVADO:   R$ {val_aprov:.2f}"
+            txt_relatorio += "RESUMO DE VALORES:\n"
+            txt_relatorio += f"VALOR APROVADO:        R$ {val_aprov:.2f}\n"
+            txt_relatorio += f"VALOR NEGADO:          R$ {val_negado:.2f}\n"
+            txt_relatorio += f"VALOR TOTAL ORÇAMENTO: R$ {val_total:.2f}"
             
             st.code(txt_relatorio)
 
