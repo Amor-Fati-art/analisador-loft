@@ -11,27 +11,53 @@ except (FileNotFoundError, KeyError):
     st.error("❌ ERRO: Arquivo secrets.toml não encontrado.")
     st.stop()
 
-st.set_page_config(page_title="Auditor Loft - Oficial & Treinado", page_icon="🏢", layout="wide")
+# --- NOVO VISUAL ARREDONDADO ---
+st.set_page_config(page_title="Auditor Loft - Oficial", page_icon="🏢", layout="wide")
+
 st.markdown("""
 <style>
-.card { padding: 15px; border-radius: 10px; margin-bottom: 10px; background-color: #1e1e1e; border: 1px solid #333; }
-.card-green { border-left: 5px solid #28a745; }
-.card-red { border-left: 5px solid #dc3545; }
-.card-yellow { border-left: 5px solid #ffc107; }
-.price { float: right; font-weight: bold; }
+    /* 1. FUNDO E CARDS */
+    .stApp { background-color: #0E1117; }
+    
+    .css-card {
+        background-color: #262730;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #333;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
 
-/* --- NOVO CÓDIGO (COLE AQUI) --- */
-[data-testid="stFileUploader"] section > div > div > span {
-    display: none;
-}
-[data-testid="stFileUploader"] section > div > div > small {
-    display: none;
-}
-[data-testid="stFileUploader"] button {
-    width: 100%;
-}
-/* ------------------------------- */
+    /* 2. RESULTADOS (Verde/Vermelho/Amarelo) */
+    .card-green { border-left: 5px solid #28a745; background-color: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+    .card-red { border-left: 5px solid #dc3545; background-color: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+    .card-yellow { border-left: 5px solid #ffc107; background-color: #1e1e1e; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+    .price { float: right; font-weight: bold; color: #fff; }
 
+    /* 3. INPUTS ARREDONDADOS */
+    .stTextArea textarea { border-radius: 15px !important; }
+    [data-testid="stFileUploader"] { border-radius: 15px; border: 1px dashed #555; padding: 10px; }
+    [data-testid="stFileUploader"]:hover { border-color: #FF4F00; }
+
+    /* 4. BOTÃO LARANJA LOFT */
+    div.stButton > button {
+        background-color: #FF4F00;
+        color: white;
+        border-radius: 12px;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    div.stButton > button:hover {
+        background-color: #ff6a2b;
+        transform: scale(1.02);
+    }
+    
+    /* Esconde textos chatos do uploader */
+    [data-testid="stFileUploader"] section > div > div > span, 
+    [data-testid="stFileUploader"] section > div > div > small { display: none; }
 </style>
 """, unsafe_allow_html=True)
 # --- BARRA LATERAL (LINK PARA SHAREPOINT) ---
@@ -769,24 +795,33 @@ Novos Exemplos: Ensinar que "Janela" solta é incerteza, e não crime.
     return prompt
 
 # --- 6. INTERFACE ---
-st.title("🏢 Auditor Loft - Base Oficial Integrada")
-st.warning("""
-⚠️ **ATENÇÃO OBRIGATÓRIA: CONFERÊNCIA DE MOTIVOS**
-A IA é uma ferramenta de apoio, antes de aprovar, verifique se o orçamento foi aprovado e negado de forma correta antes de prosseguir. **VOCÊ É O RESPONSÁVEL FINAL.**
-""")
+# --- NOVO LAYOUT COM CARDS ---
+st.title("🏢 Auditor Loft")
 
+# Card de Aviso
+st.info("⚠️ **ATENÇÃO:** A IA é uma ferramenta de apoio. Valide sempre com a Base Oficial.")
+
+# CARD 1: Vistorias
+st.markdown('<div class="css-card">', unsafe_allow_html=True)
+st.markdown("### 📂 1. Documentação (Vistorias)")
 col1, col2 = st.columns(2)
 with col1:
-    vistoria_entrada = st.file_uploader("📂 1. Vistoria Entrada (Opcional)", type=['pdf', 'txt'], key="ent")
+    vistoria_entrada = st.file_uploader("Vistoria Entrada (Opcional)", type=['pdf', 'txt'], key="ent")
 with col2:
-    vistoria_saida = st.file_uploader("📂 2. Vistoria Saída (Recomendado)", type=['pdf', 'txt'], key="sai")
+    vistoria_saida = st.file_uploader("Vistoria Saída (Recomendado)", type=['pdf', 'txt'], key="sai")
+st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown("### 📝 Orçamento para Análise")
-tab1, tab2 = st.tabs(["Digitar/Colar", "Upload Arquivo"])
+# CARD 2: Orçamento
+st.markdown('<div class="css-card">', unsafe_allow_html=True)
+st.markdown("### 📝 2. Orçamento para Análise")
+tab1, tab2 = st.tabs(["Digitar Texto", "Upload Arquivo"])
 with tab1:
-    orcamento_txt = st.text_area("Cole os itens aqui:", height=150)
+    orcamento_txt = st.text_area("Cole os itens aqui:", height=150, placeholder="Ex: Pintura interna sala... R$ 500,00")
 with tab2:
     orcamento_arq = st.file_uploader("Arquivo de Orçamento", type=['pdf', 'jpg'])
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Botão de Análise (o resto do código continua igual depois daqui)
 
 # --- LÓGICA DE PROCESSAMENTO ---
 if st.button("🔍 ANALISAR AGORA"):
