@@ -761,12 +761,15 @@ Novos Exemplos: Ensinar que "Janela" solta é incerteza, e não crime.
     - Se a regra aplicável for clara e direta (Ex: Limpeza Geral, Chave Faltando, Pintura Interna): Certeza entre 90 e 100.
     - Se o item cair em uma regra de "VERIFICAR" ou "AMARELO" (depende de foto/laudo): Certeza entre 40 e 60.
     - Se a descrição for vaga: Certeza baixa.
-    9. **REGRA CRÍTICA DE DESCONTOS (TOTAL GERAL)**:
-       - OBRIGATÓRIO: Verifique no final do documento, na seção de TOTAIS ou RESUMO FINANCEIRO, se existe um campo "Desconto", "Abatimento" ou "Desconto Promocional".
-       - Se existir, VOCÊ DEVE ADICIONAR UM ITEM NO JSON CHAMADO "DESCONTO APLICADO EM ORÇAMENTO".
-       - O VALOR DESTE ITEM DEVE SER NEGATIVO (Exemplo: Se o desconto é 740, coloque -740.00).
-       - Status: "Aprovado" (Green).
-       - Motivo: "Desconto concedido pela imobiliária/prestador no documento original."
+    9. **REGRA CRÍTICA DE DESCONTOS (ATUALIZADA E RESTRITA)**:
+       - ⛔ **PROIBIÇÃO ABSOLUTA:** Você deve **IGNORAR COMPLETAMENTE** textos sobre descontos condicionais de pagamento. 
+         - Exemplos para IGNORAR: "5% para pagamento à vista", "Desconto no PIX", "Se pagar até dia X", "Desconto para pagamento em dinheiro".
+         - Motivo: Isso é uma oferta financeira futura, não altera o valor do dano/orçamento atual.
+       
+       - ✅ **ÚNICA EXCEÇÃO (QUANDO APLICAR):** Apenas insira o item de desconto se ele **JÁ ESTIVER CALCULADO/SUBTRAÍDO** no corpo do orçamento.
+         - Exemplo Válido: Uma linha explícita dizendo "Abatimento acordado: - R$ 200,00" ou "Desconto Promocional: - R$ 50,00".
+       
+       - **TESTE DE LÓGICA:** Se o texto diz "PARA pix..." ou "CASO pague...", o desconto **NÃO EXISTE** para fins de vistoria. O valor final é o valor cheio.
 
     FORMATO DE SAÍDA JSON OBRIGATÓRIO:
     [{"Item": "Nome do item", "Valor": 0.00, "Status": "Aprovado/Negado/Verificar", "Motivo": "Copie o motivo exato do texto oficial acima, sem inventar."}]
